@@ -1,7 +1,7 @@
 import type {
   ApiMessageResponse,
   CreateTransactionRequest,
-  Transaction,
+  TransactionViewModel,
   TransactionListFilters,
   TransactionListResponse,
   UpdateTransactionRequest,
@@ -14,11 +14,11 @@ export interface TransactionsApi {
     filters?: TransactionListFilters,
     signal?: AbortSignal,
   ) => Promise<TransactionListResponse>;
-  create: (transaction: CreateTransactionRequest) => Promise<Transaction>;
+  create: (transaction: CreateTransactionRequest) => Promise<TransactionViewModel>;
   update: (
     transactionId: string,
     transaction: UpdateTransactionRequest,
-  ) => Promise<Transaction>;
+  ) => Promise<TransactionViewModel>;
   remove: (transactionId: string) => Promise<ApiMessageResponse>;
 }
 
@@ -29,7 +29,7 @@ export const transactionsApi: TransactionsApi = {
       { signal },
     ),
   create: (transaction) =>
-    restClient.request<Transaction, CreateTransactionRequest>(
+    restClient.request<TransactionViewModel, CreateTransactionRequest>(
       apiEndpoints.transactions.list,
       {
         method: "POST",
@@ -37,7 +37,7 @@ export const transactionsApi: TransactionsApi = {
       },
     ),
   update: (transactionId, transaction) =>
-    restClient.request<Transaction, UpdateTransactionRequest>(
+    restClient.request<TransactionViewModel, UpdateTransactionRequest>(
       apiEndpoints.transactions.detail(transactionId),
       {
         method: "PUT",

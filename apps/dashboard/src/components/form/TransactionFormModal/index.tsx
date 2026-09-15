@@ -3,10 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type {
-  AttachmentUploadFailure,
-  Transaction,
-} from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
+import type { AttachmentUploadFailure } from "@dashboard/features/transactions/types";
 import { Button } from "@banking/shared/ui/components/button";
 import {
   Dialog,
@@ -69,7 +67,7 @@ export const TransactionFormModal = ({
     AttachmentUploadFailure[]
   >([]);
   const [persistedTransaction, setPersistedTransaction] =
-    useState<Transaction | null>(null);
+    useState<TransactionViewModel | null>(null);
   const schema = useMemo(
     () => createTransactionFormSchema(existingAttachments.length),
     [existingAttachments.length],

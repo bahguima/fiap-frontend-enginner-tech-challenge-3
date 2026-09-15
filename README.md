@@ -1,371 +1,285 @@
-# ByteBank — FIAP Front-End Engineering Tech Challenge
+# ByteBank — Tech Challenge fase 3
 
-Aplicação de banking digital desenvolvida em um monorepo Nx com React, Next.js e TypeScript. A experiência principal usa uma arquitetura de microfrontends com Module Federation: o `shell` compõe os remotes `institutional` e `dashboard`, enquanto o app Next.js `banking` permanece disponível de forma independente.
+O ByteBank é uma plataforma de controle financeiro pessoal com aplicações **web e mobile** no mesmo workspace Nx. A fase 3 preserva a experiência web e adiciona um aplicativo Expo para Android e iOS, conectado ao Firebase Authentication, Cloud Firestore e Cloud Storage.
 
-## Sumário
+## Requisitos atendidos
 
-- [Sobre o projeto](#sobre-o-projeto)
-- [Funcionalidades](#funcionalidades)
-- [Arquitetura](#arquitetura)
-- [Tecnologias](#tecnologias)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Requisitos](#requisitos)
-- [Configuração](#configuração)
-- [Executando localmente](#executando-localmente)
-- [Credenciais de demonstração](#credenciais-de-demonstração)
-- [Rotas](#rotas)
-- [Testes e qualidade](#testes-e-qualidade)
-- [Storybook](#storybook)
-- [Docker](#docker)
-- [Deploy na Vercel](#deploy-na-vercel)
-- [Scripts disponíveis](#scripts-disponíveis)
-- [Documentação complementar](#documentação-complementar)
-
-## Sobre o projeto
-
-O ByteBank simula uma plataforma de controle financeiro pessoal. A aplicação oferece uma landing page pública, autenticação, dashboard financeiro e gerenciamento de transações.
-
-Os dados são consumidos por contratos REST tipados. Durante o desenvolvimento e os testes, o Mock Service Worker (MSW) intercepta essas requisições e simula a API sem acoplar os componentes às fixtures. O estado de servidor, incluindo autenticação, dashboard, perfil e transações, é gerenciado pelo TanStack Query.
-
-## Funcionalidades
-
-- Landing page responsiva com conteúdo institucional.
-- Login e logout com proteção das rotas autenticadas.
-- Dashboard com saldo, receitas, despesas e indicadores financeiros.
-- Gráficos de fluxo financeiro e distribuição por categoria.
-- Extrato com busca, filtros e paginação.
-- Cadastro, visualização, edição e exclusão de transações.
-- Inclusão e remoção de anexos em transações.
-- Páginas específicas para entradas, saídas e perfil.
-- Temas claro e escuro com persistência local.
-- Conteúdo em português, inglês e espanhol.
-- Componentes acessíveis baseados em Radix UI.
-- Testes unitários, de integração e de ponta a ponta.
-- Execução local ou em containers Docker.
+- Login, sessão persistente e rotas protegidas no mobile.
+- Dashboard com saldo, entradas, saídas, gráficos e transações recentes.
+- Extrato com paginação infinita, filtros e estados de loading, vazio e erro.
+- Cadastro, consulta, edição e exclusão de transações.
+- Inclusão e remoção de comprovantes.
+- Firebase Emulator Suite para desenvolvimento e testes.
+- Configuração segura para Firebase real e builds Expo/EAS.
+- Security Rules de Firestore e Storage testadas automaticamente.
+- Aplicação web da fase anterior preservada.
+- Estado de servidor no TanStack Query; Context restrito a autenticação, tema e UI.
 
 ## Arquitetura
 
-A experiência federada é formada por três aplicações React independentes:
-
-```mermaid
-flowchart LR
-  Browser["Navegador"] --> Shell["shell · porta 4200"]
-  Shell -->|"/ e /login"| Institutional["institutional · porta 8101"]
-  Shell -->|"/dashboard/*"| Dashboard["dashboard · porta 8102"]
-  Shell --> Providers["QueryClient e autenticação"]
-  Providers -. "estado compartilhado" .-> Institutional
-  Providers -. "estado compartilhado" .-> Dashboard
-  MSW["MSW"] -. "intercepta /api/*" .-> API["Cliente REST tipado"]
+```text
+                              ByteBank
+                                 |
+                +----------------+----------------+
+                |                                 |
+        Web · React 18                    Mobile · React 19
+     shell + dois remotes                    Expo SDK 55
+                |                                 |
+     cliente REST + MSW              repositórios Firebase tipados
+                |                                 |
+                +------ domínio, validações ------+
+                       e tokens compartilhados
 ```
 
-| Projeto | Responsabilidade | Execução local |
+Na web, o `shell` compõe `institutional` e `dashboard` por Module Federation. Os dados passam por um cliente REST tipado e são simulados com MSW em desenvolvimento e testes. O app Next.js `banking` permanece independente.
+
+No mobile, o Expo Router separa rotas públicas e protegidas. Telas usam hooks TanStack Query sobre repositórios tipados; componentes não acessam Firestore ou Storage diretamente. O Context mantém apenas a sessão, e as Security Rules são a fronteira real de autorização.
+
+As plataformas compartilham apenas código independente de UI. Componentes, roteamento, acesso a dados e builds ficam separados. Veja [arquitetura geral](docs/ARCHITECTURE.md) e [arquitetura mobile](docs/MOBILE_ARCHITECTURE.md).
+
+## Aplicações e workspace
+
+| Aplicação | Responsabilidade | Desenvolvimento |
 | --- | --- | --- |
-| `shell` | Host da composição, roteamento, autenticação global e `QueryClient` | `http://localhost:4200` |
-| `institutional` | Remote da landing page e do login; também funciona standalone | `http://localhost:8101` |
-| `dashboard` | Remote das áreas autenticadas e operações financeiras; também funciona standalone | `http://localhost:8102` |
-| `banking` | Aplicação Next.js 14 preservada para compatibilidade durante a evolução arquitetural | `http://localhost:3000` |
-| `shell-e2e` | Suíte Playwright que valida o fluxo integrado dos três microfrontends | — |
-
-O shell carrega apenas o remote exigido pela rota atual. Falhas de carregamento são isoladas e apresentam uma opção de nova tentativa. `React`, `React DOM`, `styled-components`, `TanStack Query` e a autenticação compartilhada são configurados como singletons na federação.
-
-Os remotes expõem `./App` por meio de seus respectivos arquivos `remoteEntry.js`. Quando executados isoladamente, criam seus próprios providers; dentro da composição, utilizam os providers globais do shell.
-
-As decisões e os limites de responsabilidade completos estão em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-
-## Tecnologias
-
-### Aplicação e arquitetura
-
-- React 18 e React DOM.
-- Next.js 14 com App Router no app `banking`.
-- Nx 23 para organização, execução de targets e cache.
-- Module Federation Enhanced para composição dos microfrontends.
-- Rspack para build e servidor de desenvolvimento dos apps federados.
-- TypeScript.
-- `styled-components`.
-
-### Interface e dados
-
-- Radix UI para primitivas acessíveis.
-- TanStack Query para estado de servidor, cache e mutações.
-- MSW para a API REST mockada em desenvolvimento e testes.
-- React Hook Form e Zod para formulários e validação.
-- Recharts e Chart.js para visualização de dados.
-- Lucide React para ícones.
-
-### Testes e qualidade
-
-- Jest e React Testing Library para testes unitários e de integração.
-- Playwright para testes E2E do fluxo federado.
-- Storybook 8 para documentação visual de componentes.
-- ESLint 9 e TypeScript para análise estática.
-
-### Infraestrutura
-
-- Docker e Docker Compose.
-- Nginx nas imagens de produção dos microfrontends.
-
-## Estrutura do projeto
+| `mobile` | App Expo para Android e iOS | Metro/Expo |
+| `shell` | Host da experiência web | `http://localhost:4200` |
+| `institutional` | Landing page e login web | `http://localhost:8101` |
+| `dashboard` | Área financeira web | `http://localhost:8102` |
+| `banking` | App Next.js independente | `http://localhost:3000` |
+| `shell-e2e` | Playwright da composição web | — |
 
 ```text
 .
 ├── apps/
-│   ├── banking/              # Aplicação Next.js independente
-│   ├── shell/                # Host da composição federada
-│   ├── institutional/        # Remote da landing page e login
-│   ├── dashboard/            # Remote das áreas autenticadas
-│   └── shell-e2e/            # Testes E2E com Playwright
+│   ├── mobile/                 # Expo Router, telas e Firebase
+│   ├── shell/                  # host web
+│   ├── institutional/          # remote público web
+│   ├── dashboard/              # remote autenticado web
+│   ├── banking/                # Next.js independente
+│   └── shell-e2e/              # Playwright
 ├── libs/shared/
-│   ├── api-client/           # Cliente REST tipado e endpoints
-│   ├── auth/                 # Autenticação compartilhada
-│   ├── query/                # Configuração do TanStack Query
-│   ├── testing/              # Handlers, fixtures e setup do MSW
-│   ├── types/                # Contratos de domínio compartilhados
-│   └── ui/                   # Componentes Radix e estilos reutilizáveis
-├── tools/module-federation/  # Configuração compartilhada da federação
-├── docs/                     # Arquitetura, containers e auditorias
-├── .storybook/               # Configuração do Storybook
-├── compose.yaml              # Ambiente Docker de produção
-├── compose.dev.yaml          # Ambiente Docker de desenvolvimento
-├── nx.json                   # Configuração do workspace Nx
-└── package.json              # Scripts e dependências
+│   ├── api-client/ auth/ query/ testing/  # infraestrutura web
+│   ├── domain/ validation/                # regras compartilháveis
+│   ├── design-tokens/ theme/              # tokens e temas
+│   └── types/ ui/                         # tipos e UI web
+├── firebase/                   # emuladores, rules, índices, seed e testes
+├── docs/
+├── nx.json
+└── package.json
 ```
 
-## Requisitos
+## Tecnologias
 
-- Node.js `20.19+` ou `22.13+`.
-- npm.
-- Docker e Docker Compose, caso queira executar a aplicação em containers.
+- Web: React 18, Next.js 14 App Router, Radix UI, `styled-components`, Rspack e Module Federation.
+- Mobile: Expo SDK 55, React Native 0.83, React 19, Expo Router e NativeWind 4.
+- Dados: TanStack Query, Firebase JS SDK no mobile e REST/MSW na web.
+- Formulários: React Hook Form e Zod.
+- Qualidade: TypeScript, ESLint, Jest, React Testing Library e Playwright.
+- Workspace: Nx 23 e npm workspaces.
 
-## Configuração
+> **NativeWind é exclusivo de `apps/mobile`.** A web continua usando Radix UI e `styled-components`; Tailwind/NativeWind não são carregados nos projetos web.
 
-Clone o repositório e instale as dependências:
+## Instalação
+
+Pré-requisitos: Node.js 20, 22 ou 24 (22 LTS recomendado), npm, Java 21+ para Firestore/Storage Emulator, Android Studio para Android e macOS/Xcode para iOS local.
 
 ```bash
 git clone https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-2.git
 cd fiap-frontend-enginner-tech-challenge-2
 npm install
+cp apps/mobile/.env.example apps/mobile/.env.local
 ```
 
-Crie o arquivo de ambiente local a partir do exemplo:
-
-```bash
-cp .env.example .env.local
-```
-
-No PowerShell:
+No PowerShell, substitua o último comando por:
 
 ```powershell
-Copy-Item .env.example .env.local
+Copy-Item apps/mobile/.env.example apps/mobile/.env.local
 ```
 
-Variáveis disponíveis:
+## Expo, Android e iOS
 
-| Variável | Padrão | Descrição |
-| --- | --- | --- |
-| `NEXT_PUBLIC_API_BASE_URL` | vazio | URL da API REST; vazio usa a mesma origem da aplicação |
-| `NEXT_PUBLIC_API_MOCKING` | `enabled` em desenvolvimento | Ativa ou desativa o MSW no navegador |
-| `NEXT_PUBLIC_API_MOCK_DELAY_MS` | `150` | Latência padrão dos handlers, em milissegundos |
-| `INSTITUTIONAL_REMOTE_URL` | `http://127.0.0.1:8101/remoteEntry.js` | Entrada do remote institucional consumida pelo shell |
-| `DASHBOARD_REMOTE_URL` | `http://127.0.0.1:8102/remoteEntry.js` | Entrada do remote de dashboard consumida pelo shell |
-| `SHELL_PUBLIC_URL` | `http://127.0.0.1:4200` | URL usada pelo dashboard standalone para retornar ao login do shell |
+Inicie o Metro e escolha a plataforma no terminal ou leia o QR code:
 
-As URLs dos remotes e da API são incorporadas ao bundle no build. Em produção, informe endereços acessíveis pelo navegador.
+```bash
+npm run mobile:doctor
+npm run mobile:start
+```
 
-Com o MSW ativo, é possível simular erros com o header `x-mock-error: true` ou o parâmetro `?mockError=true`. O header `x-mock-delay-ms` sobrescreve a latência de uma requisição.
+O Expo Doctor pode apontar React duplicado. Isso é esperado: a web usa React 18 e o bundle Expo SDK 55 usa React 19.
 
-## Executando localmente
+Com um Android Emulator aberto:
 
-Inicie o shell e os dois remotes:
+```bash
+npm run mobile:android
+```
+
+O Android Emulator usa `10.0.2.2` para alcançar a máquina host. Não use `localhost`, que aponta para o próprio emulador.
+
+Em macOS, com o Xcode:
+
+```bash
+npm run mobile:ios
+```
+
+O iOS Simulator usa `localhost`. Windows e Linux precisam de dispositivo físico ou build EAS para iOS; o build local exige macOS.
+
+### Dispositivo físico e IP LAN
+
+Telefone e computador devem estar na mesma rede. Descubra o IPv4 LAN do computador (`ipconfig` no Windows ou `ifconfig`/`ip addr` no macOS/Linux) e informe somente o IP, sem protocolo ou porta:
+
+```dotenv
+EXPO_PUBLIC_USE_FIREBASE_EMULATORS=true
+EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=192.168.1.10
+```
+
+Reinicie o Metro após mudar variáveis e libere no firewall as portas do Expo/Firebase. `localhost` no telefone significa o próprio telefone.
+
+## Firebase Emulator, seed e demonstração
+
+O ambiente local força o projeto descartável `demo-bytebank`, evitando fallback acidental para produção.
+
+```bash
+# terminal 1
+npm run firebase:emulators:start
+
+# terminal 2
+npm run firebase:seed
+npm run mobile:start
+```
+
+A interface da Emulator Suite fica em `http://localhost:4000`. O comando importa `firebase/.emulator-data`, se existir, e exporta ao encerrar. Use `npm run firebase:emulators:fresh` para ignorar dados anteriores ou `npm run firebase:emulators:clear` para limpar os emuladores ativos.
+
+Sem Java, é possível trabalhar apenas com autenticação:
+
+```bash
+npm run firebase:auth:start
+npm run firebase:auth:seed
+```
+
+O seed é idempotente. A conta local é:
+
+```text
+E-mail: demo@bytebank.test
+Senha: ByteBank123!
+```
+
+Ela pertence somente a `demo-bytebank` e não deve ser reutilizada em ambiente real.
+
+## Firebase real e variáveis
+
+Crie um projeto Firebase e um app do tipo **Web**, ative Email/Password, Firestore e Storage, publique rules/índices e configure:
+
+| Variável | Uso |
+| --- | --- |
+| `EXPO_PUBLIC_USE_FIREBASE_EMULATORS` | `true` (ou ausente) usa emuladores; `false` exige Firebase real |
+| `EXPO_PUBLIC_FIREBASE_EMULATOR_HOST` | vazio seleciona `localhost` ou `10.0.2.2`; dispositivo físico usa IP LAN |
+| `EXPO_PUBLIC_FIREBASE_API_KEY` | `apiKey` do app Firebase Web |
+| `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN` | `authDomain` |
+| `EXPO_PUBLIC_FIREBASE_PROJECT_ID` | projeto real; IDs `demo-` são recusados |
+| `EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET` | bucket do Storage |
+| `EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` | identificador do remetente |
+| `EXPO_PUBLIC_FIREBASE_APP_ID` | identificador do app |
+
+Com `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=false` e as seis variáveis preenchidas:
+
+```bash
+npm run export:real --workspace=@bytebank/mobile
+```
+
+`EXPO_PUBLIC_*` é incorporado ao bundle e **não é segredo**. Nunca inclua service account, chave privada, senha, token, client secret ou credenciais de assinatura. A autorização depende de Authentication e Security Rules.
+
+Para EAS, associe `apps/mobile` à conta Expo com `npx eas-cli@24.3.0 init`, cadastre as variáveis por ambiente e execute:
+
+```bash
+npm run mobile:eas:development
+npm run mobile:eas:preview
+npm run mobile:eas:production
+```
+
+`preview` e `production` exigem Firebase real. Consulte [Firebase real e builds Expo/EAS](docs/MOBILE_BUILD.md).
+
+## Aplicações web
 
 ```bash
 npm run dev
 ```
 
-A aplicação completa estará disponível em `http://localhost:4200`. Os remotes também poderão ser acessados isoladamente:
+A experiência integrada abre em `http://localhost:4200`. Use `dev:shell`, `dev:institutional` ou `dev:dashboard` para projetos isolados; `npm run dev:banking` abre o Next.js em `http://localhost:3000`.
 
-- Institucional: `http://localhost:8101`.
-- Dashboard: `http://localhost:8102`.
+O login web/MSW permanece `email@teste.com` / `123` e é diferente da conta Firebase mobile.
 
-Para iniciar apenas um projeto:
+## Testes, lint, typecheck e build
 
-```bash
-npm run dev:shell
-npm run dev:institutional
-npm run dev:dashboard
-```
-
-O app Next.js independente pode ser executado em `http://localhost:3000`:
-
-```bash
-npm run dev:banking
-```
-
-## Credenciais de demonstração
-
-```text
-E-mail: email@teste.com
-Senha: 123
-```
-
-## Rotas
-
-| Rota | Responsável | Descrição |
-| --- | --- | --- |
-| `/` | `institutional` | Landing page |
-| `/login` | `institutional` | Autenticação |
-| `/dashboard` | `dashboard` | Visão geral financeira |
-| `/dashboard/statement` | `dashboard` | Extrato de transações |
-| `/dashboard/income` | `dashboard` | Entradas |
-| `/dashboard/expenses` | `dashboard` | Saídas |
-| `/dashboard/profile` | `dashboard` | Perfil do usuário |
-
-O acesso direto a qualquer rota `/dashboard/*` sem uma sessão válida redireciona para `/login`.
-
-## Testes e qualidade
-
-### Testes unitários e de integração
-
-```bash
-npm test
-```
-
-Para executar em modo de observação:
-
-```bash
-npm run test:watch
-```
-
-### Testes E2E com Playwright
-
-Instale o navegador do Playwright na primeira execução:
-
-```bash
-npx playwright install chromium
-```
-
-Execute a suíte E2E:
-
-```bash
-npm run e2e
-```
-
-O Playwright inicia automaticamente `institutional`, `dashboard` e `shell`, executa os testes no Chromium e reutiliza servidores que já estejam ativos fora do CI. A suíte cobre landing page, navegação para o login, credenciais inválidas, autenticação, proteção de rota e logout.
-
-Para abrir a interface interativa:
-
-```bash
-npm run e2e:ui
-```
-
-### Verificações estáticas e build
+Gates obrigatórios da raiz:
 
 ```bash
 npm run lint
 npm run typecheck
-npm test
+npm test -- --runInBand
 npm run build
 ```
 
-O Nx executa os targets aplicáveis e reutiliza resultados do cache quando as entradas não mudaram.
+`lint` executa ESLint; `typecheck` valida TypeScript sem emitir arquivos; `test` executa Jest/Testing Library; `build` gera os projetos aplicáveis e faz `expo export` para Android, iOS e web.
 
-## Storybook
-
-Inicie o catálogo de componentes:
+Testes adicionais:
 
 ```bash
-npm run storybook
+npm run firebase:rules:test
+npm run firebase:mobile:test
+npm run e2e
 ```
 
-Acesse `http://localhost:6006`.
+O teste mobile cobre login, paginação, filtros, CRUD e anexos nos três emuladores. O E2E cobre o fluxo web no Chromium.
 
-Para gerar a versão estática em `storybook-static/`:
+## Security Rules
 
-```bash
-npm run build-storybook
-```
+`firebase/firestore.rules` e `firebase/storage.rules` negam acesso por padrão, isolam recursos por UID e validam campos, tipos, enums e limites; uploads também validam caminho, MIME type e tamanho. Índices ficam em `firebase/firestore.indexes.json`.
 
-## Docker
+Antes de usar Firebase real, mantenha `npm run firebase:rules:test` verde e publique rules e índices com o Firebase CLI. Validação da UI não substitui Security Rules.
 
-Há um Dockerfile multi-stage para cada aplicação federada. As imagens finais usam Nginx e expõem o endpoint de saúde `/healthz`.
+## Roteiro do vídeo de apresentação
 
-Crie um arquivo de configuração opcional:
+Prepare uma gravação de até cinco minutos, nesta ordem:
 
-```bash
-cp .env.docker.example .env.docker
-```
+1. mostre login, restauração de sessão, proteção de rota e navegação por tabs;
+2. apresente dashboard, comparativos, gráficos, alternativas acessíveis e animações;
+3. abra o extrato, aplique filtros e demonstre o carregamento da próxima página por scroll;
+4. crie uma transação, provoque uma validação, anexe um comprovante e conclua o cadastro;
+5. edite, consulte e exclua a transação; finalize mostrando os gates, o Expo Doctor e os testes Firebase.
 
-No PowerShell:
+Antes de gravar, inicie os emuladores com seed conhecido, confirme que o dispositivo alcança o host, desative notificações, aumente a fonte apenas se continuar sem cortes e deixe preparados os terminais com os resultados dos comandos. O link da gravação deve ser adicionado aqui somente depois da publicação.
 
-```powershell
-Copy-Item .env.docker.example .env.docker
-```
+## Solução de problemas
 
-### Ambiente de produção
+### Não conecta aos emuladores
 
-```bash
-npm run docker:build
-npm run docker:up
-npm run docker:down
-```
+- Web/iOS Simulator: `localhost`.
+- Android Emulator: `10.0.2.2`.
+- Dispositivo físico: IP LAN do computador, por exemplo `192.168.1.10`.
+- Informe somente hostname/IP, sem `http://` e sem porta.
+- Confirme mesma rede, ausência de isolamento por VPN/roteador e liberação no firewall.
+- Abra `http://localhost:4000` no computador para confirmar os emuladores.
+- Após mudar o ambiente, reinicie com `npm run mobile:start -- --clear`.
 
-O Compose de produção desativa o MSW. Configure `NEXT_PUBLIC_API_BASE_URL` antes do build para consumir uma API real.
+### Expo, Metro ou NativeWind
 
-### Ambiente de desenvolvimento
+- Rode `npm install` na raiz e `npm run mobile:doctor`.
+- Não deduplique React 18 web e React 19 mobile manualmente.
+- Rode `npm run mobile:export` para validar Metro, Babel, `global.css` e classes NativeWind.
+- Android exige emulador ativo ou depuração USB; iOS local exige macOS/Xcode.
 
-```bash
-npm run docker:dev
-npm run docker:dev:down
-```
+### Firebase real é recusado
 
-O ambiente de desenvolvimento inicia os três servidores Rspack e ativa os mocks REST por padrão. Para usar valores de `.env.docker`, execute diretamente o Compose com `--env-file`:
-
-```bash
-docker compose --env-file .env.docker -f compose.dev.yaml up --build
-```
-
-Consulte [`docs/CONTAINERS.md`](docs/CONTAINERS.md) para variáveis, health checks e detalhes das imagens.
-
-## Deploy na Vercel
-
-O arquivo `vercel.json` configura o projeto Vercel atual para gerar o app Next.js `banking` com `npm run build:banking` e publicar o diretório `apps/banking/.next`. Essa configuração evita que o deploy procure incorretamente por `.next` na raiz do monorepo.
-
-A composição federada completa requer três projetos/deployments independentes: `shell`, `institutional` e `dashboard`. Nesse cenário, configure em cada projeto o build e o diretório de saída do app correspondente, além das URLs públicas `INSTITUTIONAL_REMOTE_URL`, `DASHBOARD_REMOTE_URL` e `SHELL_PUBLIC_URL`.
-
-## Scripts disponíveis
-
-| Script | Descrição |
-| --- | --- |
-| `npm run dev` | Inicia shell, institutional e dashboard |
-| `npm run dev:banking` | Inicia o app Next.js independente |
-| `npm run dev:shell` | Inicia somente o shell |
-| `npm run dev:institutional` | Inicia somente o remote institucional |
-| `npm run dev:dashboard` | Inicia somente o remote de dashboard |
-| `npm run build` | Gera todos os builds disponíveis no workspace |
-| `npm run build:banking` | Gera somente o build do app Next.js |
-| `npm run build:federation` | Gera os três builds federados |
-| `npm run build:shell` | Gera somente o shell |
-| `npm run build:institutional` | Gera somente o remote institucional |
-| `npm run build:dashboard` | Gera somente o remote de dashboard |
-| `npm run start` | Gera e inicia o app Next.js em modo de produção |
-| `npm run lint` | Executa o ESLint nos projetos Nx |
-| `npm run typecheck` | Executa o TypeScript sem emitir arquivos |
-| `npm test` | Executa os testes Jest |
-| `npm run test:watch` | Executa o Jest em modo de observação |
-| `npm run e2e` | Executa os testes Playwright no Chromium |
-| `npm run e2e:ui` | Abre a interface do Playwright |
-| `npm run storybook` | Inicia o Storybook |
-| `npm run build-storybook` | Gera o Storybook estático |
-| `npm run docker:build` | Gera as imagens de produção |
-| `npm run docker:up` | Gera e inicia os containers de produção |
-| `npm run docker:down` | Encerra os containers de produção |
-| `npm run docker:dev` | Inicia os containers de desenvolvimento |
-| `npm run docker:dev:down` | Encerra os containers de desenvolvimento |
-| `npm run graph` | Abre o grafo de projetos do Nx |
+- Defina `EXPO_PUBLIC_USE_FIREBASE_EMULATORS=false`.
+- Preencha todas as seis variáveis públicas.
+- Use project ID que não comece com `demo-`.
+- Reinicie o Metro após alterar `.env.local`.
 
 ## Documentação complementar
 
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): decisões arquiteturais e limites entre as camadas.
-- [`docs/CONTAINERS.md`](docs/CONTAINERS.md): Dockerfiles, Compose, variáveis e health checks.
-- [`docs/AUDIT_ACCESSIBILITY_PERFORMANCE_SECURITY.md`](docs/AUDIT_ACCESSIBILITY_PERFORMANCE_SECURITY.md): auditoria de acessibilidade, performance e segurança.
-- [`docs/TECHNICAL_DEBT.md`](docs/TECHNICAL_DEBT.md): inventário de dívida técnica e evolução planejada.
+- [Arquitetura geral](docs/ARCHITECTURE.md)
+- [Arquitetura mobile da fase 3](docs/MOBILE_ARCHITECTURE.md)
+- [Firebase real e builds Expo/EAS](docs/MOBILE_BUILD.md)
+- [Firebase Emulator Suite](firebase/README.md)
+- [Mapeamento da interface mobile](docs/MOBILE_UI_MAPPING.md)
+- [Dívida técnica](docs/TECHNICAL_DEBT.md)

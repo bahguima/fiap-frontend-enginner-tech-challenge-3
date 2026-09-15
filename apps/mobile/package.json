@@ -1,0 +1,74 @@
+{
+  "name": "@bytebank/mobile",
+  "version": "0.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "expo": {
+    "autolinking": {
+      "searchPaths": [
+        "./node_modules"
+      ]
+    }
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "export": "expo export --platform all --output-dir dist --clear",
+    "export:real": "node scripts/validate-firebase-client-env.mjs && expo export --platform all --output-dir dist --clear",
+    "doctor": "expo-doctor",
+    "config:public": "expo config --type public",
+    "eas:build:development": "npx eas-cli@24.3.0 build --profile development --platform all",
+    "eas:build:preview": "npx eas-cli@24.3.0 build --profile preview --platform all",
+    "eas:build:production": "npx eas-cli@24.3.0 build --profile production --platform all",
+    "test": "jest --config jest.config.cjs",
+    "test:emulator": "jest --config jest.emulator.config.cjs --runInBand"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "55.0.12",
+    "@hookform/resolvers": "^3.10.0",
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-community/netinfo": "^11.5.2",
+    "@tanstack/react-query": "^5.100.9",
+    "expo": "55.0.31",
+    "expo-constants": "55.0.17",
+    "expo-dev-client": "~55.0.40",
+    "expo-document-picker": "~55.0.17",
+    "expo-font": "55.0.8",
+    "expo-linear-gradient": "~55.0.18",
+    "expo-linking": "55.0.17",
+    "expo-router": "55.0.18",
+    "expo-splash-screen": "~55.0.25",
+    "expo-status-bar": "55.0.6",
+    "firebase": "12.19.0",
+    "lucide-react-native": "^1.45.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "^7.75.0",
+    "react-native": "0.83.10",
+    "react-native-css-interop": "0.2.6",
+    "react-native-gesture-handler": "2.30.0",
+    "react-native-gifted-charts": "1.4.78",
+    "react-native-reanimated": "4.2.1",
+    "react-native-safe-area-context": "5.6.2",
+    "react-native-screens": "4.23.0",
+    "react-native-svg": "15.15.3",
+    "react-native-web": "0.21.2",
+    "react-native-worklets": "0.7.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@nx/expo": "23.1.0",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^29.5.14",
+    "@types/react": "19.2.10",
+    "babel-preset-expo": "55.0.25",
+    "expo-doctor": "1.20.4",
+    "jest": "^29.7.0",
+    "jest-expo": "^55.0.22",
+    "nativewind": "4.2.6",
+    "react-test-renderer": "^19.2.0",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.9.3"
+  }
+}

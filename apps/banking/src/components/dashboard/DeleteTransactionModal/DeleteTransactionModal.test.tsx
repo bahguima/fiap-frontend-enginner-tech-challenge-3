@@ -1,11 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
 import { DeleteTransactionModal } from ".";
 
-const transaction: Transaction = {
+const transaction: TransactionViewModel = {
   id: "transaction-1",
   description: "Pagamento",
   observation: "",
+  attachmentCount: 0,
   amount: -100,
   formattedAmount: "-R$ 100,00",
   type: "expense",

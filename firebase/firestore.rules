@@ -1,0 +1,136 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validTransaction() {
+      return request.resource.data.keys().hasOnly([
+          'description',
+          'descriptionNormalized',
+          'observation',
+          'amountInCents',
+          'incomeAmountInCents',
+          'expenseAmountInCents',
+          'type',
+          'categoryId',
+          'categoryName',
+          'occurredOn',
+          'status',
+          'attachmentCount',
+          'createdAt',
+          'updatedAt',
+          'schemaVersion'
+        ])
+        && request.resource.data.description is string
+        && request.resource.data.description.size() >= 3
+        && request.resource.data.description.size() <= 120
+        && request.resource.data.descriptionNormalized is string
+        && request.resource.data.descriptionNormalized.size() >= 3
+        && request.resource.data.descriptionNormalized.size() <= 120
+        && request.resource.data.observation is string
+        && request.resource.data.observation.size() <= 500
+        && request.resource.data.amountInCents is int
+        && request.resource.data.amountInCents > 0
+        && request.resource.data.amountInCents <= 99999999999
+        && request.resource.data.incomeAmountInCents is int
+        && request.resource.data.expenseAmountInCents is int
+        && request.resource.data.type in ['income', 'expense']
+        && (
+          (
+            request.resource.data.type == 'income'
+            && request.resource.data.incomeAmountInCents == request.resource.data.amountInCents
+            && request.resource.data.expenseAmountInCents == 0
+          )
+          || (
+            request.resource.data.type == 'expense'
+            && request.resource.data.incomeAmountInCents == 0
+            && request.resource.data.expenseAmountInCents == request.resource.data.amountInCents
+          )
+        )
+        && request.resource.data.categoryId is string
+        && request.resource.data.categoryId.size() > 0
+        && request.resource.data.categoryId.size() <= 120
+        && request.resource.data.categoryName is string
+        && request.resource.data.categoryName.size() > 0
+        && request.resource.data.categoryName.size() <= 120
+        && request.resource.data.occurredOn is string
+        && request.resource.data.occurredOn.matches(
+          '^[0-9]{4}-(0[1-9]|1[0-2])-([0-2][0-9]|3[01])$'
+        )
+        && request.resource.data.status in ['completed', 'pending', 'failed']
+        && request.resource.data.attachmentCount is int
+        && request.resource.data.attachmentCount >= 0
+        && request.resource.data.attachmentCount <= 5
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp
+        && request.resource.data.schemaVersion == 1;
+    }
+
+    function validAttachment(uid, transactionId, attachmentId) {
+      return request.resource.data.keys().hasOnly([
+          'fileName',
+          'contentType',
+          'sizeInBytes',
+          'storagePath',
+          'status',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.fileName is string
+        && request.resource.data.fileName.size() > 0
+        && request.resource.data.fileName.size() <= 180
+        && request.resource.data.contentType in [
+          'application/pdf',
+          'image/jpeg',
+          'image/png'
+        ]
+        && request.resource.data.sizeInBytes is int
+        && request.resource.data.sizeInBytes > 0
+        && request.resource.data.sizeInBytes <= 5 * 1024 * 1024
+        && request.resource.data.storagePath is string
+        && request.resource.data.storagePath.matches(
+          '^users/' + uid + '/transactions/' + transactionId + '/' +
+          attachmentId + '-[A-Za-z0-9][A-Za-z0-9._-]*$'
+        )
+        && request.resource.data.status in ['pending', 'ready', 'failed']
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+
+      match /transactions/{transactionId} {
+        allow read, delete: if isOwner(uid);
+        allow create: if isOwner(uid) && validTransaction();
+        allow update: if isOwner(uid)
+          && validTransaction()
+          && request.resource.data.createdAt == resource.data.createdAt;
+
+        match /attachments/{attachmentId} {
+          allow read, delete: if isOwner(uid);
+          allow create: if isOwner(uid)
+            && validAttachment(uid, transactionId, attachmentId);
+          allow update: if isOwner(uid)
+            && validAttachment(uid, transactionId, attachmentId)
+            && request.resource.data.storagePath == resource.data.storagePath
+            && request.resource.data.fileName == resource.data.fileName
+            && request.resource.data.contentType == resource.data.contentType
+            && request.resource.data.createdAt == resource.data.createdAt;
+        }
+      }
+    }
+
+    match /transactionCategories/{categoryId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

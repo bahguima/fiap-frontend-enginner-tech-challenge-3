@@ -47,6 +47,14 @@ export default defineConfig((_env, argv) => {
           WORKSPACE_ROOT,
           'libs/shared/api-client/src'
         ),
+        '@banking/shared/design-tokens': path.resolve(
+          WORKSPACE_ROOT,
+          'libs/shared/design-tokens/src'
+        ),
+        '@banking/shared/domain': path.resolve(
+          WORKSPACE_ROOT,
+          'libs/shared/domain/src'
+        ),
         '@banking/shared/query': path.resolve(
           WORKSPACE_ROOT,
           'libs/shared/query/src'
@@ -58,6 +66,10 @@ export default defineConfig((_env, argv) => {
         '@banking/shared/types': path.resolve(
           WORKSPACE_ROOT,
           'libs/shared/types/src'
+        ),
+        '@banking/shared/validation': path.resolve(
+          WORKSPACE_ROOT,
+          'libs/shared/validation/src'
         ),
         '@banking/shared/ui': path.resolve(
           WORKSPACE_ROOT,

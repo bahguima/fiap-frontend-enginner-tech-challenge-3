@@ -3,12 +3,14 @@ import { act, renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { http, HttpResponse } from "msw";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
+import { attachmentsApi } from "@banking/shared/api-client/attachments";
+import { transactionsApi } from "@banking/shared/api-client/transactions";
 import { server } from "@banking/shared/testing/mocks/server";
 import type {
   ApiErrorResponse,
   TransactionAttachment,
-  TransactionSubmissionResult,
 } from "@banking/shared/types";
+import type { TransactionSubmissionResult } from "../types";
 import { useDashboardSummaryQuery } from "@dashboard/features/dashboard/hooks/useDashboard";
 import { transactionQueryKeys } from "../api/queryKeys";
 import {
@@ -296,6 +298,59 @@ describe("hooks de transações", () => {
     });
     await waitFor(() => {
       expect(result.current.transactions.data?.total).toBe(7);
+    });
+  });
+
+  it("persiste o anexo, mantém o contador ao editar e o devolve ao reabrir", async () => {
+    const queryClient = createTestQueryClient();
+    const { result } = renderHook(useCreateTransactionSubmissionMutation, {
+      wrapper: createWrapper(queryClient),
+    });
+    const file = new File(["comprovante"], "comprovante-novo.pdf", {
+      type: "application/pdf",
+    });
+
+    let submissionResult: TransactionSubmissionResult | null = null;
+    await act(async () => {
+      submissionResult = await result.current.mutateAsync({
+        transaction: {
+          description: "Transação persistida com anexo",
+          amount: 140,
+          type: "expense",
+          category: "Pagamento",
+          date: "2026-07-25",
+          status: "completed",
+          observation: "Validação da persistência",
+        },
+        attachments: [file],
+        persistedTransaction: null,
+      });
+    });
+
+    expect(submissionResult).not.toBeNull();
+    const transactionId = submissionResult!.transaction.id;
+    expect(submissionResult!.failedAttachments).toHaveLength(0);
+
+    await expect(attachmentsApi.list(transactionId)).resolves.toMatchObject({
+      items: [
+        {
+          transactionId,
+          fileName: "comprovante-novo.pdf",
+        },
+      ],
+    });
+
+    await transactionsApi.update(transactionId, {
+      ...submissionResult!.transaction.editableFields,
+      description: "Transação editada com anexo",
+    });
+
+    const persistedList = await transactionsApi.list();
+    expect(
+      persistedList.items.find((transaction) => transaction.id === transactionId),
+    ).toMatchObject({
+      description: "Transação editada com anexo",
+      attachmentCount: 1,
     });
   });
 

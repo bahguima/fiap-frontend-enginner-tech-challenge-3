@@ -21,12 +21,14 @@ export type {
   CreateTransactionRequest,
   Transaction,
   TransactionCategoryName,
+  TransactionDocument,
   TransactionEditableFields,
   TransactionListFilters,
   TransactionListResponse,
   TransactionSort,
   TransactionStatus,
   TransactionType,
+  TransactionViewModel,
   UpdateTransactionRequest,
 } from "./transactions";
 export type {
@@ -35,11 +37,9 @@ export type {
   TransactionCategory,
 } from "./categories";
 export type {
-  AttachmentUploadFailure,
+  AttachmentMetadataInput,
   AttachmentListResponse,
-  CreateAttachmentRequest,
   TransactionAttachment,
   TransactionAttachmentPolicy,
-  TransactionSubmissionResult,
 } from "./attachments";
 export { transactionAttachmentPolicy } from "./attachments";

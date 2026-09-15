@@ -12,6 +12,10 @@ const customJestConfig = {
       "<rootDir>/libs/shared/api-client/src/$1",
     "^@banking/shared/auth$":
       "<rootDir>/libs/shared/auth/src/index.ts",
+    "^@banking/shared/design-tokens$":
+      "<rootDir>/libs/shared/design-tokens/src/index.ts",
+    "^@banking/shared/domain$":
+      "<rootDir>/libs/shared/domain/src/index.ts",
     "^@banking/shared/query$":
       "<rootDir>/libs/shared/query/src/index.ts",
     "^@banking/shared/testing/(.*)$":
@@ -20,6 +24,8 @@ const customJestConfig = {
       "<rootDir>/libs/shared/types/src/index.ts",
     "^@banking/shared/types/(.*)$":
       "<rootDir>/libs/shared/types/src/$1",
+    "^@banking/shared/validation$":
+      "<rootDir>/libs/shared/validation/src/index.ts",
     "^@banking/shared/ui$": "<rootDir>/libs/shared/ui/src/index.ts",
     "^@banking/shared/ui/(.*)$":
       "<rootDir>/libs/shared/ui/src/$1",
@@ -44,6 +50,7 @@ const customJestConfig = {
   ],
   testPathIgnorePatterns: [
     "<rootDir>/apps/banking/.next/",
+    "<rootDir>/apps/mobile/",
     "<rootDir>/apps/shell-e2e/",
     "<rootDir>/node_modules/",
   ],

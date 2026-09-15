@@ -1,9 +1,9 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type {
-  Transaction,
   TransactionCategory,
-  TransactionSubmissionResult,
+  TransactionViewModel,
 } from "@banking/shared/types";
+import type { TransactionSubmissionResult } from "@dashboard/features/transactions/types";
 import { TransactionFormModal } from ".";
 import type { ITransactionFormModalProps } from "./interface";
 
@@ -13,10 +13,11 @@ const categories: TransactionCategory[] = [
   { id: "category-3", name: "Pagamento", type: "expense" },
 ];
 
-const savedTransaction: Transaction = {
+const savedTransaction: TransactionViewModel = {
   id: "transaction-101",
   description: "Pagamento teste",
   observation: "",
+  attachmentCount: 0,
   amount: 125.5,
   formattedAmount: "+R$ 125,50",
   type: "income",

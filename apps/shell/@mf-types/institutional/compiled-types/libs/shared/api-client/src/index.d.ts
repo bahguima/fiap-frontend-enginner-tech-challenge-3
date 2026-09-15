@@ -1,5 +1,5 @@
 export { attachmentsApi } from "./attachments";
-export type { AttachmentsApi } from "./attachments";
+export type { AttachmentsApi, WebAttachmentInput } from "./attachments";
 export { authApi } from "./auth";
 export type { AuthApi } from "./auth";
 export { categoriesApi } from "./categories";

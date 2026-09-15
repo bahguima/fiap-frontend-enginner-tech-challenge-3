@@ -1,10 +1,15 @@
 export interface TransactionAttachmentPolicy {
     maximumFiles: number;
-    maximumFileSize: number;
-    acceptedMimeTypes: string[];
-    acceptedFileExtensions: string;
+    maximumFileSizeInBytes: number;
+    acceptedMimeTypes: readonly string[];
+    acceptedFileExtensions: readonly string[];
 }
 export declare const transactionAttachmentPolicy: TransactionAttachmentPolicy;
+export interface AttachmentMetadataInput {
+    name: string;
+    mimeType: string;
+    sizeInBytes: number;
+}
 export interface TransactionAttachment {
     id: string;
     transactionId: string;
@@ -17,16 +22,4 @@ export interface TransactionAttachment {
 }
 export interface AttachmentListResponse {
     items: TransactionAttachment[];
-}
-export interface CreateAttachmentRequest {
-    file: File;
-}
-export interface AttachmentUploadFailure {
-    file: File;
-    message: string;
-}
-export interface TransactionSubmissionResult {
-    transaction: import("./transactions").Transaction;
-    uploadedAttachments: TransactionAttachment[];
-    failedAttachments: AttachmentUploadFailure[];
 }

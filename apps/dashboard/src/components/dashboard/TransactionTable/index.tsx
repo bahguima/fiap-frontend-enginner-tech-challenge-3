@@ -1,6 +1,6 @@
 "use client";
 
-import { Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Eye, MoreHorizontal, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@banking/shared/ui/components/button";
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import {
   ActionMenuContent,
   ActionsCell,
   AmountCell,
+  AttachmentCount,
   BodyCell,
   BodyRow,
   CompletedIcon,
@@ -57,6 +58,7 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
               <HeaderCell>{t("table.category")}</HeaderCell>
               <HeaderCell>{t("table.date")}</HeaderCell>
               <HeaderCell>{t("table.status")}</HeaderCell>
+              <HeaderCell>Anexos</HeaderCell>
               <HeaderCell $align="right">{t("table.amount")}</HeaderCell>
               {hasActions && <HeaderCell $align="right">Ações</HeaderCell>}
             </HeaderRow>
@@ -78,6 +80,14 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
                     {transaction.statusLabel}
                   </Status>
                 </BodyCell>
+                <MutedCell>
+                  <AttachmentCount
+                    aria-label={formatAttachmentCount(transaction.attachmentCount)}
+                  >
+                    <Paperclip aria-hidden="true" size={14} />
+                    {formatAttachmentCount(transaction.attachmentCount)}
+                  </AttachmentCount>
+                </MutedCell>
                 <AmountCell $type={transaction.type}>
                   {transaction.formattedAmount}
                 </AmountCell>
@@ -102,7 +112,8 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
               <div>
                 <MobileDescription>{transaction.description}</MobileDescription>
                 <MobileMeta>
-                  {transaction.category} · {transaction.formattedDate}
+                  {transaction.category} · {transaction.formattedDate} ·{" "}
+                  {formatAttachmentCount(transaction.attachmentCount)}
                 </MobileMeta>
               </div>
             </MobileItemInfo>
@@ -117,6 +128,11 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
       </MobileList>
     </TableRoot>
   );
+}
+
+function formatAttachmentCount(count: number) {
+  if (count === 0) return "Nenhum anexo";
+  return `${count} ${count === 1 ? "anexo" : "anexos"}`;
 }
 
 function TransactionActionsMenu({

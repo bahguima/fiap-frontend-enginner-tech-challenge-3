@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/mobile"
+  ],
   "scripts": {
     "dev": "nx run-many -t serve --projects=shell,institutional,dashboard --parallel=1",
     "dev:banking": "nx dev banking",
@@ -29,6 +32,23 @@
     "test:watch": "jest --watch",
     "e2e": "nx e2e shell-e2e --project=chromium",
     "e2e:ui": "nx e2e shell-e2e --ui --project=chromium",
+    "mobile:start": "nx start mobile",
+    "mobile:android": "nx android mobile",
+    "mobile:ios": "nx ios mobile",
+    "mobile:export": "nx export mobile",
+    "mobile:doctor": "nx doctor mobile",
+    "mobile:eas:development": "npm run eas:build:development --workspace=@bytebank/mobile",
+    "mobile:eas:preview": "npm run eas:build:preview --workspace=@bytebank/mobile",
+    "mobile:eas:production": "npm run eas:build:production --workspace=@bytebank/mobile",
+    "firebase:emulators:start": "node firebase/scripts/start-emulators.mjs",
+    "firebase:emulators:fresh": "node firebase/scripts/start-emulators.mjs --fresh",
+    "firebase:auth:start": "node firebase/scripts/start-emulators.mjs --auth-only",
+    "firebase:auth:seed": "node firebase/scripts/seed-auth.mjs",
+    "firebase:emulators:clear": "node firebase/scripts/clear-emulators.mjs",
+    "firebase:emulators:export": "firebase emulators:export firebase/.emulator-data --config firebase/firebase.json --project demo-bytebank --force",
+    "firebase:seed": "node firebase/scripts/seed.mjs",
+    "firebase:rules:test": "firebase emulators:exec --config firebase/firebase.json --project demo-bytebank --only firestore,storage \"node --test --test-concurrency=1 firebase/tests/firebase.rules.test.mjs\"",
+    "firebase:mobile:test": "firebase emulators:exec --config firebase/firebase.json --project demo-bytebank --only auth,firestore,storage \"npm run test:emulator --workspace=@bytebank/mobile\"",
     "graph": "nx graph"
   },
   "dependencies": {
@@ -85,6 +105,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@nx/devkit": "23.1.0",
     "@nx/eslint": "^23.1.0",
     "@nx/eslint-plugin": "^23.1.0",
@@ -110,6 +131,7 @@
     "@types/react-dom": "^18.3.7",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "firebase-tools": "^15.30.0",
     "globals": "^15.15.0",
     "jest": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",

@@ -1,7 +1,7 @@
 import { ArrowDownLeft, ArrowUpRight, CheckCircle2, Clock, XCircle } from "lucide-react";
 import styled from "styled-components";
 import { DropdownMenuContent, DropdownMenuItem } from "@banking/shared/ui/components/dropdown-menu";
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
 
 import type { HeaderCellAlign } from "./interface";
 
@@ -61,7 +61,7 @@ export const MutedCell = styled(BodyCell)`
   color: hsl(var(--muted-foreground));
 `;
 
-export const AmountCell = styled(BodyCell)<{ $type: Transaction["type"] }>`
+export const AmountCell = styled(BodyCell)<{ $type: TransactionViewModel["type"] }>`
   color: ${({ $type }) => ($type === "income" ? "hsl(var(--success))" : "hsl(var(--destructive))")};
   font-weight: 500;
   text-align: right;
@@ -72,7 +72,7 @@ export const ActionsCell = styled(BodyCell)`
   text-align: right;
 `;
 
-export const TypeIconBox = styled.div<{ $type: Transaction["type"] }>`
+export const TypeIconBox = styled.div<{ $type: TransactionViewModel["type"] }>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -146,7 +146,7 @@ export const MobileMeta = styled.div`
   font-size: 0.75rem;
 `;
 
-export const MobileAmount = styled.div<{ $type: Transaction["type"] }>`
+export const MobileAmount = styled.div<{ $type: TransactionViewModel["type"] }>`
   flex-shrink: 0;
   color: ${({ $type }) => ($type === "income" ? "hsl(var(--success))" : "hsl(var(--destructive))")};
   font-size: 0.875rem;

@@ -1,7 +1,11 @@
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionAttachment, TransactionViewModel } from "@banking/shared/types";
 export interface TransactionDetailsModalProps {
     "data-testid"?: string;
     open: boolean;
-    transaction?: Transaction | null;
+    transaction?: TransactionViewModel | null;
+    attachments: TransactionAttachment[];
+    isAttachmentsError: boolean;
+    isAttachmentsLoading: boolean;
     onOpenChange: (open: boolean) => void;
+    onRetryAttachments: () => void;
 }

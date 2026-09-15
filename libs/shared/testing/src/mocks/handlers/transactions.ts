@@ -3,11 +3,12 @@ import type {
   ApiErrorResponse,
   ApiMessageResponse,
   CreateTransactionRequest,
-  Transaction,
+  TransactionViewModel,
   TransactionListFilters,
   TransactionListResponse,
   UpdateTransactionRequest,
 } from "@banking/shared/types";
+import { isCalendarDateOnOrBefore, getCalendarDateValue } from "@banking/shared/domain";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
 import {
   createMockTransaction,
@@ -36,7 +37,7 @@ export const transactionHandlers = [
       );
     },
   ),
-  http.post<never, CreateTransactionRequest, Transaction | ApiErrorResponse>(
+  http.post<never, CreateTransactionRequest, TransactionViewModel | ApiErrorResponse>(
     mockApiEndpoints.transactions.list,
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
@@ -46,7 +47,7 @@ export const transactionHandlers = [
       const validationError = validateTransaction(transaction);
       if (validationError) return validationError;
 
-      return HttpResponse.json<Transaction>(
+      return HttpResponse.json<TransactionViewModel>(
         createMockTransaction(transaction),
         { status: 201 },
       );
@@ -55,7 +56,7 @@ export const transactionHandlers = [
   http.put<
     TransactionPathParams,
     UpdateTransactionRequest,
-    Transaction | ApiErrorResponse
+    TransactionViewModel | ApiErrorResponse
   >(
     mockApiEndpoints.transactions.detail,
     async ({ params, request }) => {
@@ -79,7 +80,7 @@ export const transactionHandlers = [
         );
       }
 
-      return HttpResponse.json<Transaction>(updatedTransaction);
+      return HttpResponse.json<TransactionViewModel>(updatedTransaction);
     },
   ),
   http.delete<
@@ -213,26 +214,5 @@ function validateTransaction(
 }
 
 function isValidTransactionDate(value: string) {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
-
-  const parsedDate = new Date(`${value}T12:00:00`);
-  if (Number.isNaN(parsedDate.getTime())) return false;
-
-  const normalizedDate = [
-    parsedDate.getFullYear().toString().padStart(4, "0"),
-    (parsedDate.getMonth() + 1).toString().padStart(2, "0"),
-    parsedDate.getDate().toString().padStart(2, "0"),
-  ].join("-");
-
-  return normalizedDate === value && value <= getCurrentDateValue();
-}
-
-function getCurrentDateValue() {
-  const currentDate = new Date();
-
-  return [
-    currentDate.getFullYear().toString().padStart(4, "0"),
-    (currentDate.getMonth() + 1).toString().padStart(2, "0"),
-    currentDate.getDate().toString().padStart(2, "0"),
-  ].join("-");
+  return isCalendarDateOnOrBefore(value, getCalendarDateValue(new Date()));
 }

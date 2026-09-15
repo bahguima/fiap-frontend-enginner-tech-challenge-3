@@ -10,8 +10,8 @@ import { TransactionFormModal } from "@dashboard/components/form/TransactionForm
 import { QueryState } from "@banking/shared/ui/components/QueryState";
 import { Button } from "@banking/shared/ui/components/button";
 import type {
-  Transaction,
   TransactionEditableFields,
+  TransactionViewModel,
 } from "@banking/shared/types";
 import { useLanguage } from "@dashboard/contexts/LanguageContext";
 import {
@@ -65,7 +65,7 @@ export default function StatementPage({
     ) ?? null;
   const attachmentsQuery = useTransactionAttachmentsQuery(
     selectedTransactionId,
-    dialog === "edit",
+    dialog === "edit" || dialog === "details",
   );
 
   const handleDialogOpenChange = (isOpen: boolean) => {
@@ -81,7 +81,7 @@ export default function StatementPage({
   const handleCreateTransaction = (
     transaction: TransactionEditableFields,
     attachments: File[],
-    persistedTransaction: Transaction | null,
+    persistedTransaction: TransactionViewModel | null,
   ) =>
     createTransaction.mutateAsync({
       transaction,
@@ -92,7 +92,7 @@ export default function StatementPage({
   const handleUpdateTransaction = (
     transaction: TransactionEditableFields,
     attachments: File[],
-    persistedTransaction: Transaction | null,
+    persistedTransaction: TransactionViewModel | null,
   ) => {
     if (!selectedTransaction) {
       return Promise.reject(new Error("Transação não encontrada."));
@@ -239,7 +239,15 @@ export default function StatementPage({
         }
         isSubmitting={updateTransaction.isPending}
       />
-      <TransactionDetailsModal open={dialog === "details"} transaction={selectedTransaction} onOpenChange={handleDialogOpenChange} />
+      <TransactionDetailsModal
+        open={dialog === "details"}
+        transaction={selectedTransaction}
+        attachments={attachmentsQuery.data?.items ?? []}
+        isAttachmentsError={attachmentsQuery.isError}
+        isAttachmentsLoading={attachmentsQuery.isPending}
+        onOpenChange={handleDialogOpenChange}
+        onRetryAttachments={() => void attachmentsQuery.refetch()}
+      />
       <DeleteTransactionModal
         open={dialog === "delete"}
         transaction={selectedTransaction}

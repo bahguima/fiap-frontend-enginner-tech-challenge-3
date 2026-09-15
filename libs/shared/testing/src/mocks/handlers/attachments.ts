@@ -3,10 +3,10 @@ import type {
   ApiErrorResponse,
   ApiMessageResponse,
   AttachmentListResponse,
-  CreateAttachmentRequest,
   TransactionAttachment,
 } from "@banking/shared/types";
 import { transactionAttachmentPolicy } from "@banking/shared/types";
+import { attachmentMetadataSchema } from "@banking/shared/validation";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
 import {
   createMockAttachment,
@@ -77,9 +77,13 @@ export const attachmentHandlers = [
         );
       }
 
-      if (
-        !transactionAttachmentPolicy.acceptedMimeTypes.includes(file.type)
-      ) {
+      const attachmentValidation = attachmentMetadataSchema.safeParse({
+        name: file.name,
+        mimeType: file.type,
+        sizeInBytes: file.size,
+      });
+
+      if (!attachmentValidation.success && !transactionAttachmentPolicy.acceptedMimeTypes.includes(file.type)) {
         return createErrorResponse(
           422,
           "VALIDATION_ERROR",
@@ -88,7 +92,7 @@ export const attachmentHandlers = [
         );
       }
 
-      if (file.size > transactionAttachmentPolicy.maximumFileSize) {
+      if (file.size > transactionAttachmentPolicy.maximumFileSizeInBytes) {
         return createErrorResponse(
           422,
           "VALIDATION_ERROR",
@@ -109,10 +113,8 @@ export const attachmentHandlers = [
         );
       }
 
-      const attachment: CreateAttachmentRequest = { file };
-
       return HttpResponse.json<TransactionAttachment>(
-        createMockAttachment(params.transactionId, attachment),
+        createMockAttachment(params.transactionId, file),
         { status: 201 },
       );
     },

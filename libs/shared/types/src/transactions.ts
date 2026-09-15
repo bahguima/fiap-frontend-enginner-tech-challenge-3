@@ -9,6 +9,54 @@ export type TransactionSort =
   | "description-desc";
 export type TransactionCategoryName = string;
 
+/** Raw persistence shape. Timestamp values are supplied by the data adapter. */
+export interface TransactionDocument<TTimestamp = unknown> {
+  description: string;
+  observation: string;
+  amountInCents: number;
+  type: TransactionType;
+  categoryId: string;
+  categoryName: TransactionCategoryName;
+  occurredOn: string;
+  status: TransactionStatus;
+  attachmentCount: number;
+  createdAt: TTimestamp;
+  updatedAt: TTimestamp;
+  schemaVersion: 1;
+}
+
+/** Platform-neutral domain model. Monetary values are always integer cents. */
+export interface Transaction {
+  id: string;
+  description: string;
+  observation: string;
+  amountInCents: number;
+  type: TransactionType;
+  categoryId: string;
+  category: TransactionCategoryName;
+  date: string;
+  status: TransactionStatus;
+  attachmentCount: number;
+}
+
+/** Presentation contract consumed by the existing web application. */
+export interface TransactionViewModel {
+  id: string;
+  description: string;
+  observation: string;
+  attachmentCount: number;
+  amount: number;
+  formattedAmount: string;
+  type: TransactionType;
+  typeLabel: string;
+  category: TransactionCategoryName;
+  date: string;
+  formattedDate: string;
+  status: TransactionStatus;
+  statusLabel: string;
+  editableFields: TransactionEditableFields;
+}
+
 export interface TransactionEditableFields {
   description: string;
   amount: number;
@@ -17,22 +65,6 @@ export interface TransactionEditableFields {
   date: string;
   status: TransactionStatus;
   observation: string;
-}
-
-export interface Transaction {
-  id: string;
-  description: string;
-  observation: string;
-  amount: number;
-  formattedAmount: string;
-  type: TransactionType;
-  typeLabel: string;
-  category: string;
-  date: string;
-  formattedDate: string;
-  status: TransactionStatus;
-  statusLabel: string;
-  editableFields: TransactionEditableFields;
 }
 
 export interface TransactionListFilters {
@@ -51,7 +83,7 @@ export interface TransactionListFilters {
 }
 
 export interface TransactionListResponse {
-  items: Transaction[];
+  items: TransactionViewModel[];
   total: number;
   page: number;
   pageSize: number;
@@ -63,6 +95,7 @@ export interface TransactionListResponse {
   resultsLabel: string;
 }
 
+/** REST input kept in major units for compatibility with the existing web UI. */
 export interface CreateTransactionRequest {
   description: string;
   amount: number;

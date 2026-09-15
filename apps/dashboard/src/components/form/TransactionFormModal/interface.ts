@@ -1,16 +1,16 @@
 import type {
-  Transaction,
   TransactionAttachment,
   TransactionCategory,
   TransactionEditableFields,
-  TransactionSubmissionResult,
+  TransactionViewModel,
 } from "@banking/shared/types";
+import type { TransactionSubmissionResult } from "@dashboard/features/transactions/types";
 
 export interface ITransactionFormModalProps {
   "data-testid"?: string;
   mode: "create" | "edit";
   open: boolean;
-  transaction?: Transaction | null;
+  transaction?: TransactionViewModel | null;
   categories: TransactionCategory[];
   existingAttachments: TransactionAttachment[];
   isCategoriesError: boolean;
@@ -23,7 +23,7 @@ export interface ITransactionFormModalProps {
   onSubmit: (
     transaction: TransactionEditableFields,
     attachments: File[],
-    persistedTransaction: Transaction | null,
+    persistedTransaction: TransactionViewModel | null,
   ) => Promise<TransactionSubmissionResult>;
   errorMessage?: string | null;
   isSubmitting?: boolean;
