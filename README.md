@@ -81,7 +81,7 @@ As plataformas compartilham apenas código independente de UI. Componentes, rote
 
 ## Código-fonte e execução local do mobile
 
-O código-fonte está disponível no repositório Git [bahguima/fiap-frontend-enginner-tech-challenge-2](https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-3). O aplicativo mobile fica em `apps/mobile`, e as configurações locais do Firebase ficam em `firebase`.
+O código-fonte está disponível no repositório Git [bahguima/fiap-frontend-enginner-tech-challenge-3](https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-3). O aplicativo mobile fica em `apps/mobile`, e as configurações locais do Firebase ficam em `firebase`.
 
 ### Dependências necessárias
 
