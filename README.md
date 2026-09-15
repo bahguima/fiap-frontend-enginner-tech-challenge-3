@@ -79,9 +79,22 @@ As plataformas compartilham apenas código independente de UI. Componentes, rote
 
 > **NativeWind é exclusivo de `apps/mobile`.** A web continua usando Radix UI e `styled-components`; Tailwind/NativeWind não são carregados nos projetos web.
 
-## Instalação
+## Código-fonte e execução local do mobile
 
-Pré-requisitos: Node.js 20, 22 ou 24 (22 LTS recomendado), npm, Java 21+ para Firestore/Storage Emulator, Android Studio para Android e macOS/Xcode para iOS local.
+O código-fonte está disponível no repositório Git [bahguima/fiap-frontend-enginner-tech-challenge-2](https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-2). O aplicativo mobile fica em `apps/mobile`, e as configurações locais do Firebase ficam em `firebase`.
+
+### Dependências necessárias
+
+- Git para clonar o repositório.
+- Node.js 20, 22 ou 24; a versão 22 LTS é a recomendada.
+- npm, utilizado pelos workspaces e scripts da raiz.
+- Java 21 ou superior para executar os emuladores do Firestore e do Cloud Storage.
+- Android Studio e um Android Emulator, ou um dispositivo físico com Expo Go/dev client.
+- macOS com Xcode para executar o iOS Simulator localmente; em Windows e Linux, use um dispositivo físico ou um build EAS para iOS.
+
+Não é necessário instalar Expo CLI ou Firebase CLI globalmente. As versões compatíveis são executadas pelos scripts do projeto após `npm install`.
+
+### Instalação
 
 ```bash
 git clone https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-2.git
@@ -96,7 +109,7 @@ No PowerShell, substitua o último comando por:
 Copy-Item apps/mobile/.env.example apps/mobile/.env.local
 ```
 
-## Expo, Android e iOS
+### Expo, Android e iOS
 
 Inicie o Metro e escolha a plataforma no terminal ou leia o QR code:
 
@@ -123,7 +136,7 @@ npm run mobile:ios
 
 O iOS Simulator usa `localhost`. Windows e Linux precisam de dispositivo físico ou build EAS para iOS; o build local exige macOS.
 
-### Dispositivo físico e IP LAN
+#### Dispositivo físico e IP LAN
 
 Telefone e computador devem estar na mesma rede. Descubra o IPv4 LAN do computador (`ipconfig` no Windows ou `ifconfig`/`ip addr` no macOS/Linux) e informe somente o IP, sem protocolo ou porta:
 
@@ -134,7 +147,7 @@ EXPO_PUBLIC_FIREBASE_EMULATOR_HOST=192.168.1.10
 
 Reinicie o Metro após mudar variáveis e libere no firewall as portas do Expo/Firebase. `localhost` no telefone significa o próprio telefone.
 
-## Firebase Emulator, seed e demonstração
+### Firebase Emulator, seed e demonstração
 
 O ambiente local força o projeto descartável `demo-bytebank`, evitando fallback acidental para produção.
 
@@ -165,7 +178,7 @@ Senha: ByteBank123!
 
 Ela pertence somente a `demo-bytebank` e não deve ser reutilizada em ambiente real.
 
-## Firebase real e variáveis
+### Firebase real e variáveis
 
 Crie um projeto Firebase e um app do tipo **Web**, ative Email/Password, Firestore e Storage, publique rules/índices e configure:
 
