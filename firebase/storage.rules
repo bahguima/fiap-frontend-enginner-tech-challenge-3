@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function isAllowedUpload() {
+      return request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType != null
+        && request.resource.contentType.matches('^(application/pdf|image/(jpeg|png))$');
+    }
+
+    function isSafeObjectName(fileName) {
+      return fileName.size() <= 180
+        && fileName.matches('^[A-Za-z0-9_-]+-[A-Za-z0-9][A-Za-z0-9._-]*$');
+    }
+
+    match /users/{uid}/transactions/{transactionId}/{fileName} {
+      allow read, delete: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+        && isAllowedUpload()
+        && isSafeObjectName(fileName);
+    }
+
+    match /{path=**} {
+      allow read, write: if false;
+    }
+  }
+}

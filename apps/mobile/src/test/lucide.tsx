@@ -1,0 +1,34 @@
+import { View } from "react-native";
+
+const Icon = () => <View accessibilityElementsHidden />;
+
+export const AlertCircle = Icon;
+export const ArrowDownLeft = Icon;
+export const ArrowLeft = Icon;
+export const ArrowUpRight = Icon;
+export const Calendar = Icon;
+export const CalendarDays = Icon;
+export const CheckCircle2 = Icon;
+export const ChevronDown = Icon;
+export const ChevronRight = Icon;
+export const CreditCard = Icon;
+export const ExternalLink = Icon;
+export const Filter = Icon;
+export const Globe2 = Icon;
+export const Home = Icon;
+export const Inbox = Icon;
+export const Info = Icon;
+export const List = Icon;
+export const LoaderCircle = Icon;
+export const LogOut = Icon;
+export const Mail = Icon;
+export const Moon = Icon;
+export const Paperclip = Icon;
+export const Plus = Icon;
+export const RotateCcw = Icon;
+export const Sun = Icon;
+export const Trash2 = Icon;
+export const Upload = Icon;
+export const UserRound = Icon;
+export const Wallet = Icon;
+export const X = Icon;

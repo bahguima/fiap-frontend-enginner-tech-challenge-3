@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "react": ["node_modules/@types/react/index.d.ts"],
+      "react/jsx-runtime": ["node_modules/@types/react/jsx-runtime.d.ts"],
+      "react/jsx-dev-runtime": [
+        "node_modules/@types/react/jsx-dev-runtime.d.ts"
+      ],
+      "@banking/shared/design-tokens": ["../../libs/shared/design-tokens/src/index.ts"],
+      "@banking/shared/domain": ["../../libs/shared/domain/src/index.ts"],
+      "@banking/shared/types": ["../../libs/shared/types/src/index.ts"],
+      "@banking/shared/validation": ["../../libs/shared/validation/src/index.ts"],
+      "@mobile/*": ["src/*"]
+    }
+  }
+}

@@ -21,8 +21,20 @@ blob-report
 test-output
 playwright/.cache
 *.local
+.env
+.env.*
+!.env.example
+!**/.env.example
+!.env.docker.example
 .env.docker
+.expo
 *.tsbuildinfo
+firebase/.emulator-data/
+firebase/firebase-debug.log
+firebase/firestore-debug.log
+firebase/ui-debug.log
+firebase/*service-account*.json
+firebase/*firebase-adminsdk*.json
 
 # Editor directories and files
 .vscode/*

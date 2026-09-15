@@ -1,14 +1,25 @@
-import type { CreateTransactionRequest } from "@banking/shared/types";
+import type {
+  TransactionCategoryName,
+  TransactionStatus,
+  TransactionType,
+} from "@banking/shared/types";
 
-export interface MockTransactionSeed extends CreateTransactionRequest {
+export interface MockTransactionSeed {
   id: string;
+  description: string;
+  amountInCents: number;
+  type: TransactionType;
+  category: TransactionCategoryName;
+  date: string;
+  status: TransactionStatus;
+  observation?: string;
 }
 
 export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-1",
     description: "Depósito de salário",
-    amount: 8500,
+    amountInCents: 850000,
     type: "income",
     category: "Depósito",
     date: "2026-04-10",
@@ -17,7 +28,7 @@ export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-2",
     description: "Assinatura de streaming",
-    amount: 59.9,
+    amountInCents: 5990,
     type: "expense",
     category: "Pagamento",
     date: "2026-04-09",
@@ -26,7 +37,7 @@ export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-3",
     description: "Compra no mercado",
-    amount: 427.43,
+    amountInCents: 42743,
     type: "expense",
     category: "Pagamento",
     date: "2026-04-08",
@@ -35,7 +46,7 @@ export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-4",
     description: "Pagamento de projeto",
-    amount: 2200,
+    amountInCents: 220000,
     type: "income",
     category: "Transferência",
     date: "2026-04-07",
@@ -44,7 +55,7 @@ export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-5",
     description: "Conta de energia",
-    amount: 189.5,
+    amountInCents: 18950,
     type: "expense",
     category: "Pagamento",
     date: "2026-04-06",
@@ -53,7 +64,7 @@ export const mockTransactionSeeds: MockTransactionSeed[] = [
   {
     id: "transaction-6",
     description: "Aplicação financeira",
-    amount: 500,
+    amountInCents: 50000,
     type: "expense",
     category: "Investimento",
     date: "2026-04-05",

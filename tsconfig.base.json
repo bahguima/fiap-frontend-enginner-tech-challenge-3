@@ -24,13 +24,19 @@
         "libs/shared/api-client/src/*"
       ],
       "@banking/shared/auth": ["libs/shared/auth/src/index.ts"],
+      "@banking/shared/design-tokens": [
+        "libs/shared/design-tokens/src/index.ts"
+      ],
+      "@banking/shared/domain": ["libs/shared/domain/src/index.ts"],
       "@banking/shared/query": ["libs/shared/query/src/index.ts"],
       "@banking/shared/testing/*": ["libs/shared/testing/src/*"],
       "@banking/shared/types": ["libs/shared/types/src/index.ts"],
       "@banking/shared/types/*": ["libs/shared/types/src/*"],
+      "@banking/shared/validation": [
+        "libs/shared/validation/src/index.ts"
+      ],
       "@banking/shared/ui": ["libs/shared/ui/src/index.ts"],
-      "@banking/shared/ui/*": ["libs/shared/ui/src/*"]
-      ,
+      "@banking/shared/ui/*": ["libs/shared/ui/src/*"],
       "@dashboard/*": ["apps/dashboard/src/*"],
       "@institutional/*": ["apps/institutional/src/*"]
     }

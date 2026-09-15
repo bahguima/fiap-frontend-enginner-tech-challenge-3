@@ -7,20 +7,21 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import type {
-  AttachmentUploadFailure,
   CreateTransactionRequest,
-  Transaction,
   TransactionAttachment,
   TransactionEditableFields,
   TransactionListFilters,
-  TransactionSubmissionResult,
   UpdateTransactionRequest,
+  TransactionViewModel,
 } from "@banking/shared/types";
 import { transactionsApi } from "@banking/shared/api-client/transactions";
 import { categoriesApi } from "@banking/shared/api-client/categories";
 import { attachmentsApi } from "@banking/shared/api-client/attachments";
 import { dashboardQueryKeys } from "@dashboard/features/dashboard/api/queryKeys";
 import { transactionQueryKeys } from "../api/queryKeys";
+import type { AttachmentUploadFailure, TransactionSubmissionResult } from "../types";
+
+export type { AttachmentUploadFailure, TransactionSubmissionResult } from "../types";
 
 export interface UpdateTransactionVariables {
   transactionId: string;
@@ -30,14 +31,14 @@ export interface UpdateTransactionVariables {
 export interface CreateTransactionSubmissionVariables {
   transaction: TransactionEditableFields;
   attachments: File[];
-  persistedTransaction: Transaction | null;
+  persistedTransaction: TransactionViewModel | null;
 }
 
 export interface UpdateTransactionSubmissionVariables {
   transactionId: string;
   transaction: TransactionEditableFields;
   attachments: File[];
-  persistedTransaction: Transaction | null;
+  persistedTransaction: TransactionViewModel | null;
 }
 
 export interface DeleteTransactionAttachmentVariables {
@@ -170,7 +171,7 @@ function useInvalidateTransactionResources() {
 }
 
 async function uploadTransactionAttachments(
-  transaction: Transaction,
+  transaction: TransactionViewModel,
   attachments: File[],
 ): Promise<TransactionSubmissionResult> {
   const uploadedAttachments: TransactionAttachment[] = [];

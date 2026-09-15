@@ -1,17 +1,20 @@
 import type {
   ApiMessageResponse,
   AttachmentListResponse,
-  CreateAttachmentRequest,
   TransactionAttachment,
 } from "@banking/shared/types";
 import { restClient } from "./client";
 import { apiEndpoints } from "./endpoints";
 
+export interface WebAttachmentInput {
+  file: File;
+}
+
 export interface AttachmentsApi {
   list: (transactionId: string) => Promise<AttachmentListResponse>;
   create: (
     transactionId: string,
-    attachment: CreateAttachmentRequest,
+    attachment: WebAttachmentInput,
   ) => Promise<TransactionAttachment>;
   remove: (attachmentId: string) => Promise<ApiMessageResponse>;
 }
@@ -34,7 +37,7 @@ export const attachmentsApi: AttachmentsApi = {
 
 function uploadAttachment(
   transactionId: string,
-  attachment: CreateAttachmentRequest,
+  attachment: WebAttachmentInput,
 ) {
   const formData = new FormData();
   formData.append("file", attachment.file);

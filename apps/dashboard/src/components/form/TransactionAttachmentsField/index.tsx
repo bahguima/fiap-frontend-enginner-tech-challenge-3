@@ -63,7 +63,7 @@ export const TransactionAttachmentsField = ({
       <Input
         id="transaction-attachments"
         type="file"
-        accept={transactionAttachmentPolicy.acceptedFileExtensions}
+        accept={transactionAttachmentPolicy.acceptedFileExtensions.join(",")}
         multiple
         onChange={handleFilesChange}
       />

@@ -54,6 +54,30 @@ describe("StatementPage", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("exibe o contador e carrega os anexos persistidos ao abrir os detalhes", async () => {
+    renderPage();
+
+    expect(
+      await screen.findByText("Assinatura de streaming", { selector: "td" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("1 anexo").length).toBeGreaterThan(0);
+
+    fireEvent.pointerDown(
+      screen.getAllByRole("button", {
+        name: "Ações para Assinatura de streaming",
+      })[0],
+      { button: 0, ctrlKey: false },
+    );
+    fireEvent.click(
+      await screen.findByRole("menuitem", { name: "Ver detalhes" }),
+    );
+
+    expect(
+      await screen.findByRole("list", { name: "Anexos da transação" }),
+    ).toHaveTextContent("comprovante-streaming.pdf");
+    expect(screen.getByText("240 KB")).toBeInTheDocument();
+  });
+
   it("envia todos os filtros avançados e exibe somente o resultado da API", async () => {
     renderPage();
 

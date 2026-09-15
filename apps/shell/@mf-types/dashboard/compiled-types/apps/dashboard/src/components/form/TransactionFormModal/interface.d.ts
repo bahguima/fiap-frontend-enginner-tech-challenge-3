@@ -1,9 +1,10 @@
-import type { Transaction, TransactionAttachment, TransactionCategory, TransactionEditableFields, TransactionSubmissionResult } from "@banking/shared/types";
+import type { TransactionAttachment, TransactionCategory, TransactionEditableFields, TransactionViewModel } from "@banking/shared/types";
+import type { TransactionSubmissionResult } from "@dashboard/features/transactions/types";
 export interface ITransactionFormModalProps {
     "data-testid"?: string;
     mode: "create" | "edit";
     open: boolean;
-    transaction?: Transaction | null;
+    transaction?: TransactionViewModel | null;
     categories: TransactionCategory[];
     existingAttachments: TransactionAttachment[];
     isCategoriesError: boolean;
@@ -13,7 +14,7 @@ export interface ITransactionFormModalProps {
     isRemovingAttachment: boolean;
     onOpenChange: (open: boolean) => void;
     onRemoveExistingAttachment: (attachmentId: string) => void;
-    onSubmit: (transaction: TransactionEditableFields, attachments: File[], persistedTransaction: Transaction | null) => Promise<TransactionSubmissionResult>;
+    onSubmit: (transaction: TransactionEditableFields, attachments: File[], persistedTransaction: TransactionViewModel | null) => Promise<TransactionSubmissionResult>;
     errorMessage?: string | null;
     isSubmitting?: boolean;
 }

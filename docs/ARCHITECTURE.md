@@ -73,7 +73,10 @@ A UI renderiza os estados fornecidos pelos hooks de domínio. Esses hooks encaps
 | `apps/banking/src/components` | Composição de UI específica da aplicação | Conhecer MSW ou implementar contratos HTTP |
 | hooks de domínio | Expor queries e mutations com uma API de uso previsível | Duplicar cache em Context |
 | `libs/shared/ui` | Primitivas Radix UI, estilos e componentes reutilizáveis | Acessar data-access, auth ou testing |
-| `libs/shared/types` | Contratos compartilhados e tipos de domínio | Depender de React ou de outras camadas |
+| `libs/shared/types` | Tipos neutros de transação, categoria, filtros, ordenação e políticas de anexos | Depender de APIs de plataforma |
+| `libs/shared/domain` | Moeda em centavos, datas, mapeamentos e agregações puras | Conhecer persistência, DOM ou UI |
+| `libs/shared/validation` | Schemas Zod independentes de plataforma | Validar objetos específicos de web ou mobile |
+| `libs/shared/design-tokens` | Cores, espaçamento, raios e tipografia primitivos | Expor CSS, `className` ou componentes |
 | `libs/shared/api-client` | Executar requests e traduzir erros de transporte | Controlar estado visual |
 | `libs/shared/query` | Configuração comum do TanStack Query | Conhecer views ou mocks |
 | `libs/shared/auth` | Context e contrato de autenticação global | Armazenar outros dados de servidor |
@@ -126,7 +129,10 @@ apps/
 libs/
 `-- shared/
     |-- ui/                      # Radix UI e styled-components
-    |-- types/                   # contratos REST
+    |-- types/                   # tipos e políticas neutros
+    |-- domain/                  # regras e transformações puras
+    |-- validation/              # schemas Zod neutros
+    |-- design-tokens/           # tokens visuais primitivos
     |-- api-client/              # cliente HTTP tipado
     |-- query/                   # configuração TanStack Query
     |-- auth/                    # autenticação global
@@ -166,5 +172,6 @@ O Module Federation conecta somente `shell`, `institutional` e `dashboard`. O ap
 14. Desenvolvimento conjunto e builds independentes configurados no Nx.
 15. Landing page migrada para `institutional` e dashboard completo migrado para `dashboard`.
 16. Home autenticada com análises financeiras, estados de consulta e alternativas tabulares acessíveis.
+17. Tipos e regras multiplataforma separados entre `types`, `domain`, `validation` e `design-tokens`, com persistência monetária em `amountInCents`.
 
 Cada etapa deve manter lint, typecheck, testes e build verdes.

@@ -1,8 +1,8 @@
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
 
 export interface TransactionTableProps {
   "data-testid"?: string;
-  data: Transaction[];
+  data: TransactionViewModel[];
   onView?: (transactionId: string) => void;
   onEdit?: (transactionId: string) => void;
   onDelete?: (transactionId: string) => void;
@@ -10,11 +10,11 @@ export interface TransactionTableProps {
 
 export interface TransactionActionsMenuProps
   extends Pick<TransactionTableProps, "onView" | "onEdit" | "onDelete"> {
-  transaction: Transaction;
+  transaction: TransactionViewModel;
 }
 
 export interface StatusIconProps {
-  status: Transaction["status"];
+  status: TransactionViewModel["status"];
 }
 
 export type HeaderCellAlign = "left" | "right";

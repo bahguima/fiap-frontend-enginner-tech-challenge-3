@@ -1,4 +1,4 @@
-import type { Transaction } from "./transactions";
+import type { TransactionViewModel } from "./transactions";
 export interface DashboardAmount {
     value: number;
     formattedValue: string;
@@ -70,11 +70,11 @@ export interface DashboardCategoryDistribution {
 export interface DashboardRecentTransactions {
     title: string;
     emptyMessage: string;
-    firstTransaction: Transaction | null;
-    secondTransaction: Transaction | null;
-    thirdTransaction: Transaction | null;
-    fourthTransaction: Transaction | null;
-    fifthTransaction: Transaction | null;
+    firstTransaction: TransactionViewModel | null;
+    secondTransaction: TransactionViewModel | null;
+    thirdTransaction: TransactionViewModel | null;
+    fourthTransaction: TransactionViewModel | null;
+    fifthTransaction: TransactionViewModel | null;
 }
 export interface DashboardHomeSuccessResponse {
     status: "success";

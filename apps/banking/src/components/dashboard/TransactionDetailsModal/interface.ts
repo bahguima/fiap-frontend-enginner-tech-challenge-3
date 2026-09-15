@@ -1,8 +1,8 @@
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
 
 export interface TransactionDetailsModalProps {
   "data-testid"?: string;
   open: boolean;
-  transaction?: Transaction | null;
+  transaction?: TransactionViewModel | null;
   onOpenChange: (open: boolean) => void;
 }

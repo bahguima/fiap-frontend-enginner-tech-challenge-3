@@ -1,19 +1,29 @@
 import type {
   AuthSession,
-  CreateAttachmentRequest,
   CreateTransactionRequest,
   DashboardAmount,
   DashboardHomeResponse,
   DashboardSummaryResponse,
   Transaction,
   TransactionAttachment,
+  TransactionDocument,
   TransactionListFilters,
   TransactionListResponse,
   TransactionSort,
+  TransactionViewModel,
   UpdateTransactionRequest,
 } from "@banking/shared/types";
+import {
+  aggregateFinancialTransactions,
+  formatCurrencyFromCents,
+  fromAmountInCents,
+  toAmountInCents,
+  transactionDocumentToDomain,
+  transactionToViewModel,
+} from "@banking/shared/domain";
 import { mockAttachments } from "./fixtures/attachments";
 import { mockAuthUser } from "./fixtures/auth";
+import { mockCategories } from "./fixtures/categories";
 import {
   mockTransactionSeeds,
   type MockTransactionSeed,
@@ -23,14 +33,25 @@ import { mockDashboardHome as mockDashboardHomeFixture } from "./fixtures/dashbo
 let authenticated = false;
 let transactionSequence = 100;
 let attachmentSequence = 100;
-let transactions: Transaction[] = [];
+interface StoredTransaction {
+  id: string;
+  document: TransactionDocument<string>;
+}
+
+interface WebFileMetadata {
+  name: string;
+  type: string;
+  size: number;
+}
+
+let transactionDocuments: StoredTransaction[] = [];
 let attachments: TransactionAttachment[] = [];
 
 export function resetMockState() {
   authenticated = false;
   transactionSequence = 100;
   attachmentSequence = 100;
-  transactions = mockTransactionSeeds.map(createTransactionFromSeed);
+  transactionDocuments = mockTransactionSeeds.map(createTransactionDocumentFromSeed);
   attachments = mockAttachments.map((attachment) => ({ ...attachment }));
 }
 
@@ -53,7 +74,7 @@ export function clearMockSession() {
 export function listMockTransactions(
   filters: TransactionListFilters,
 ): TransactionListResponse {
-  let result = transactions;
+  let result = transactionDocuments.map(toTransaction).map(transactionToViewModel);
 
   if (filters.search) {
     const normalizedSearch = normalizeSearch(filters.search);
@@ -145,18 +166,19 @@ export function listMockTransactions(
 }
 
 export function findMockTransaction(transactionId: string) {
-  return transactions.find((transaction) => transaction.id === transactionId) ?? null;
+  const storedTransaction = transactionDocuments.find(({ id }) => id === transactionId);
+  return storedTransaction ? transactionToViewModel(toTransaction(storedTransaction)) : null;
 }
 
 export function createMockTransaction(request: CreateTransactionRequest) {
   transactionSequence += 1;
-  const transaction = createTransaction({
+  const storedTransaction = createTransactionDocumentFromRequest({
     id: `transaction-${transactionSequence}`,
     ...request,
   });
 
-  transactions = [transaction, ...transactions];
-  return transaction;
+  transactionDocuments = [storedTransaction, ...transactionDocuments];
+  return transactionToViewModel(toTransaction(storedTransaction));
 }
 
 export function updateMockTransaction(
@@ -167,16 +189,16 @@ export function updateMockTransaction(
 
   if (!currentTransaction) return null;
 
-  const updatedTransaction = createTransaction({
+  const updatedTransaction = createTransactionDocumentFromRequest({
     id: transactionId,
     ...request,
-  });
+  }, currentTransaction.attachmentCount);
 
-  transactions = transactions.map((transaction) =>
+  transactionDocuments = transactionDocuments.map((transaction) =>
     transaction.id === transactionId ? updatedTransaction : transaction,
   );
 
-  return updatedTransaction;
+  return transactionToViewModel(toTransaction(updatedTransaction));
 }
 
 export function deleteMockTransaction(transactionId: string) {
@@ -184,7 +206,7 @@ export function deleteMockTransaction(transactionId: string) {
 
   if (!currentTransaction) return false;
 
-  transactions = transactions.filter(
+  transactionDocuments = transactionDocuments.filter(
     (transaction) => transaction.id !== transactionId,
   );
   attachments = attachments.filter(
@@ -194,30 +216,20 @@ export function deleteMockTransaction(transactionId: string) {
 }
 
 export function getMockDashboardSummary(): DashboardSummaryResponse {
-  let totalIncome = 0;
-  let totalExpense = 0;
-
-  for (const transaction of transactions) {
-    if (transaction.status !== "completed") continue;
-
-    if (transaction.type === "income") {
-      totalIncome += Math.abs(transaction.amount);
-    } else {
-      totalExpense += Math.abs(transaction.amount);
-    }
-  }
-
-  const balance = totalIncome - totalExpense;
+  const aggregation = aggregateFinancialTransactions(
+    transactionDocuments.map(toTransaction),
+  );
 
   return {
-    balance: createDashboardAmount(balance),
-    totalIncome: createDashboardAmount(totalIncome),
-    totalExpense: createDashboardAmount(totalExpense),
-    savings: createDashboardAmount(balance),
+    balance: createDashboardAmount(aggregation.balanceInCents),
+    totalIncome: createDashboardAmount(aggregation.totalIncomeInCents),
+    totalExpense: createDashboardAmount(aggregation.totalExpenseInCents),
+    savings: createDashboardAmount(aggregation.balanceInCents),
   };
 }
 
 export function getMockDashboardHome(): DashboardHomeResponse {
+  const transactions = transactionDocuments.map(toTransaction).map(transactionToViewModel);
   return {
     ...mockDashboardHomeFixture,
     recentTransactions: {
@@ -239,22 +251,23 @@ export function listMockAttachments(transactionId: string) {
 
 export function createMockAttachment(
   transactionId: string,
-  request: CreateAttachmentRequest,
+  file: WebFileMetadata,
 ) {
   attachmentSequence += 1;
   const attachmentId = `attachment-${attachmentSequence}`;
   const attachment: TransactionAttachment = {
     id: attachmentId,
     transactionId,
-    fileName: request.file.name,
-    contentType: request.file.type,
-    size: request.file.size,
-    formattedSize: formatFileSize(request.file.size),
+    fileName: file.name,
+    contentType: file.type,
+    size: file.size,
+    formattedSize: formatFileSize(file.size),
     uploadedAt: "2026-07-23T12:00:00.000Z",
     downloadUrl: `/api/attachments/${attachmentId}/content`,
   };
 
   attachments = [attachment, ...attachments];
+  updateMockTransactionAttachmentCount(transactionId, 1);
   return attachment;
 }
 
@@ -264,69 +277,92 @@ export function deleteMockAttachment(attachmentId: string) {
   if (!attachment) return false;
 
   attachments = attachments.filter((item) => item.id !== attachmentId);
+  updateMockTransactionAttachmentCount(attachment.transactionId, -1);
   return true;
 }
 
-function createTransactionFromSeed(seed: MockTransactionSeed) {
-  return createTransaction(seed);
+function createTransactionDocumentFromSeed(seed: MockTransactionSeed) {
+  const attachmentCount = mockAttachments.filter(
+    (attachment) => attachment.transactionId === seed.id,
+  ).length;
+
+  return createTransactionDocument(seed, seed.amountInCents, attachmentCount);
 }
 
-function createTransaction(seed: MockTransactionSeed): Transaction {
-  const amount = seed.type === "income" ? Math.abs(seed.amount) : -Math.abs(seed.amount);
+function createTransactionDocumentFromRequest(
+  seed: CreateTransactionRequest & { id: string },
+  attachmentCount = 0,
+) {
+  return createTransactionDocument(
+    seed,
+    toAmountInCents(Math.abs(seed.amount)),
+    attachmentCount,
+  );
+}
+
+function createTransactionDocument(
+  seed: Omit<MockTransactionSeed, "amountInCents">,
+  amountInCents: number,
+  attachmentCount: number,
+): StoredTransaction {
   const observation = seed.observation?.trim() ?? "";
+  const category = mockCategories.find((item) => item.name === seed.category);
+  const timestamp = "2026-07-23T12:00:00.000Z";
 
   return {
     id: seed.id,
-    description: seed.description.trim(),
-    observation,
-    amount,
-    formattedAmount: `${seed.type === "income" ? "+" : "-"}${formatCurrency(Math.abs(amount))}`,
-    type: seed.type,
-    typeLabel: seed.type === "income" ? "Entrada" : "Saída",
-    category: seed.category,
-    date: seed.date,
-    formattedDate: formatDate(seed.date),
-    status: seed.status,
-    statusLabel: getStatusLabel(seed.status),
-    editableFields: {
+    document: {
       description: seed.description.trim(),
-      amount: Math.abs(seed.amount),
-      type: seed.type,
-      category: seed.category,
-      date: seed.date,
-      status: seed.status,
       observation,
+      amountInCents,
+      type: seed.type,
+      categoryId: category?.id ?? "category-unknown",
+      categoryName: seed.category,
+      occurredOn: seed.date,
+      status: seed.status,
+      attachmentCount,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      schemaVersion: 1,
     },
   };
 }
 
-function createDashboardAmount(value: number): DashboardAmount {
-  return {
-    value,
-    formattedValue: formatCurrency(value),
-  };
-}
+function updateMockTransactionAttachmentCount(
+  transactionId: string,
+  difference: 1 | -1,
+) {
+  transactionDocuments = transactionDocuments.map((transaction) => {
+    if (transaction.id !== transactionId) return transaction;
 
-function formatCurrency(value: number) {
-  return value.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
+    return {
+      ...transaction,
+      document: {
+        ...transaction.document,
+        attachmentCount: Math.max(
+          0,
+          transaction.document.attachmentCount + difference,
+        ),
+        updatedAt: "2026-07-23T12:00:00.000Z",
+      },
+    };
   });
 }
 
-function formatDate(value: string) {
-  return new Date(`${value}T12:00:00`).toLocaleDateString("pt-BR");
+function toTransaction(storedTransaction: StoredTransaction): Transaction {
+  return transactionDocumentToDomain(storedTransaction.id, storedTransaction.document);
+}
+
+function createDashboardAmount(amountInCents: number): DashboardAmount {
+  return {
+    value: fromAmountInCents(amountInCents),
+    formattedValue: formatCurrencyFromCents(amountInCents),
+  };
 }
 
 function formatFileSize(size: number) {
   if (size < 1024) return `${size} bytes`;
   return `${Math.round(size / 1024)} KB`;
-}
-
-function getStatusLabel(status: Transaction["status"]) {
-  if (status === "completed") return "Concluída";
-  if (status === "pending") return "Pendente";
-  return "Falhou";
 }
 
 function normalizeSearch(value: string) {
@@ -339,31 +375,31 @@ function normalizeSearch(value: string) {
 
 function createTransactionComparator(sort: TransactionSort) {
   if (sort === "date-asc") {
-    return (first: Transaction, second: Transaction) =>
+    return (first: TransactionViewModel, second: TransactionViewModel) =>
       first.date.localeCompare(second.date);
   }
 
   if (sort === "amount-desc") {
-    return (first: Transaction, second: Transaction) =>
+    return (first: TransactionViewModel, second: TransactionViewModel) =>
       Math.abs(second.amount) - Math.abs(first.amount);
   }
 
   if (sort === "amount-asc") {
-    return (first: Transaction, second: Transaction) =>
+    return (first: TransactionViewModel, second: TransactionViewModel) =>
       Math.abs(first.amount) - Math.abs(second.amount);
   }
 
   if (sort === "description-asc") {
-    return (first: Transaction, second: Transaction) =>
+    return (first: TransactionViewModel, second: TransactionViewModel) =>
       first.description.localeCompare(second.description, "pt-BR");
   }
 
   if (sort === "description-desc") {
-    return (first: Transaction, second: Transaction) =>
+    return (first: TransactionViewModel, second: TransactionViewModel) =>
       second.description.localeCompare(first.description, "pt-BR");
   }
 
-  return (first: Transaction, second: Transaction) =>
+  return (first: TransactionViewModel, second: TransactionViewModel) =>
     second.date.localeCompare(first.date);
 }
 

@@ -1,9 +1,9 @@
-import type { Transaction } from "@banking/shared/types";
+import type { TransactionViewModel } from "@banking/shared/types";
 
 export interface DeleteTransactionModalProps {
   "data-testid"?: string;
   open: boolean;
-  transaction?: Transaction | null;
+  transaction?: TransactionViewModel | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
   errorMessage?: string | null;

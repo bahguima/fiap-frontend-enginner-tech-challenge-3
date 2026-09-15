@@ -8,13 +8,29 @@ import {
   DialogTitle,
 } from "@banking/shared/ui/components/dialog";
 import type { TransactionDetailsModalProps } from "./interface";
-import { DetailsLabel, DetailsList, DetailsRow, DetailsValue } from "./styled";
+import {
+  AttachmentDetailsRow,
+  AttachmentItem,
+  AttachmentList,
+  AttachmentMeta,
+  AttachmentName,
+  AttachmentStatus,
+  DetailsLabel,
+  DetailsList,
+  DetailsRow,
+  DetailsValue,
+  RetryAttachmentsButton,
+} from "./styled";
 
 export function TransactionDetailsModal({
   "data-testid": dataTestId,
   open,
   transaction,
+  attachments,
+  isAttachmentsError,
+  isAttachmentsLoading,
   onOpenChange,
+  onRetryAttachments,
 }: TransactionDetailsModalProps) {
   if (!transaction) {
     return null;
@@ -59,6 +75,44 @@ export function TransactionDetailsModal({
               {transaction.observation || "Não informada"}
             </DetailsValue>
           </DetailsRow>
+          <AttachmentDetailsRow>
+            <DetailsLabel>Anexos</DetailsLabel>
+            <DetailsValue>
+              {isAttachmentsLoading && (
+                <AttachmentStatus role="status">
+                  Carregando anexos...
+                </AttachmentStatus>
+              )}
+              {isAttachmentsError && (
+                <AttachmentStatus role="alert">
+                  Não foi possível carregar os anexos.{" "}
+                  <RetryAttachmentsButton
+                    type="button"
+                    onClick={onRetryAttachments}
+                  >
+                    Tentar novamente
+                  </RetryAttachmentsButton>
+                </AttachmentStatus>
+              )}
+              {!isAttachmentsLoading &&
+                !isAttachmentsError &&
+                attachments.length === 0 && (
+                  <AttachmentStatus>Nenhum anexo</AttachmentStatus>
+                )}
+              {!isAttachmentsLoading &&
+                !isAttachmentsError &&
+                attachments.length > 0 && (
+                  <AttachmentList aria-label="Anexos da transação">
+                    {attachments.map((attachment) => (
+                      <AttachmentItem key={attachment.id}>
+                        <AttachmentName>{attachment.fileName}</AttachmentName>
+                        <AttachmentMeta>{attachment.formattedSize}</AttachmentMeta>
+                      </AttachmentItem>
+                    ))}
+                  </AttachmentList>
+                )}
+            </DetailsValue>
+          </AttachmentDetailsRow>
         </DetailsList>
       </DialogContent>
     </Dialog>

@@ -1,4 +1,5 @@
-import type { AttachmentUploadFailure, TransactionAttachment } from "@banking/shared/types";
+import type { TransactionAttachment } from "@banking/shared/types";
+import type { AttachmentUploadFailure } from "@dashboard/features/transactions/types";
 export interface ITransactionAttachmentsFieldProps {
     "data-testid"?: string;
     existingAttachments: TransactionAttachment[];

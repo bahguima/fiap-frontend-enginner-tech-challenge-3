@@ -1,0 +1,24 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "../../node_modules/@types"],
+    "types": ["react", "nativewind/types", "jest"],
+    "paths": {
+      "@banking/shared/design-tokens": ["../../libs/shared/design-tokens/src/index.ts"],
+      "@banking/shared/domain": ["../../libs/shared/domain/src/index.ts"],
+      "@banking/shared/types": ["../../libs/shared/types/src/index.ts"],
+      "@banking/shared/validation": ["../../libs/shared/validation/src/index.ts"],
+      "@mobile/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "app.config.ts",
+    "nativewind-env.d.ts",
+    ".expo/types/**/*.ts",
+    "expo-env.d.ts"
+  ]
+}
