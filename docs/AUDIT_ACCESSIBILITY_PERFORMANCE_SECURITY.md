@@ -305,5 +305,5 @@ Executados no estado final:
 
 - `npm run lint`: 18/18 projetos aprovados.
 - `npm run typecheck`: 18/18 projetos aprovados.
-- `npm test -- --runInBand`: 13/13 projetos, 71 suítes, 281 testes aprovados.
+- `npm test -- --runInBand`: 13/13 projetos, 73 suítes, 303 testes aprovados (duas execuções seguidas, depois de tornar determinísticos os testes de persistência e do aviso de inatividade, que oscilavam sob a execução paralela do Nx).
 - `npm run build`: 5/5 projetos aprovados. Os `mf-stats.json` de shell, institutional e dashboard listam `@banking/shared/api-client` como singleton.
