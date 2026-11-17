@@ -48,8 +48,14 @@ services:
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-}
         NEXT_PUBLIC_API_MOCKING: disabled
         NEXT_PUBLIC_API_MOCK_DELAY_MS: ${NEXT_PUBLIC_API_MOCK_DELAY_MS:-150}
+        NEXT_PUBLIC_IDLE_TIMEOUT_SECONDS: ${NEXT_PUBLIC_IDLE_TIMEOUT_SECONDS:-600}
+        NEXT_PUBLIC_IDLE_WARNING_SECONDS: ${NEXT_PUBLIC_IDLE_WARNING_SECONDS:-60}
         INSTITUTIONAL_REMOTE_URL: ${INSTITUTIONAL_REMOTE_URL:-http://127.0.0.1:8101/remoteEntry.js}
         DASHBOARD_REMOTE_URL: ${DASHBOARD_REMOTE_URL:-http://127.0.0.1:8102/remoteEntry.js}
+    environment:
+      # Origens dos remotes e da API liberadas na CSP do documento do shell.
+      CSP_REMOTE_ORIGINS: ${CSP_REMOTE_ORIGINS:-http://127.0.0.1:8101 http://127.0.0.1:8102}
+      CSP_API_ORIGIN: ${CSP_API_ORIGIN:-}
     depends_on:
       institutional:
         condition: service_healthy

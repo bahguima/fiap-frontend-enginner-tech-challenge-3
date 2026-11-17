@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { LanguageSelector } from "@institutional/components/LanguageSelector";
 import { Label } from "@banking/shared/ui/components/label";
-import { useAuth } from "@banking/shared/auth";
+import { useAuth, type LoginResult } from "@banking/shared/auth";
 import { useLanguage } from "@institutional/contexts/LanguageContext";
 import { BrandLinkText } from "@banking/shared/ui/styles/shared";
 
@@ -14,6 +14,7 @@ import {
   BackLink,
   DemoText,
   ErrorMessage,
+  SessionNotice,
   Field,
   Form,
   FormPanel,
@@ -29,25 +30,49 @@ import {
   Title,
 } from "./styled";
 
+type LoginFailure = Exclude<LoginResult, { status: "authenticated" }>;
+
+function useLoginFailureMessage(failure: LoginFailure | null) {
+  const { t } = useLanguage();
+  if (failure === null) return null;
+
+  if (failure.status === "locked") {
+    const minutes = Math.max(1, Math.ceil(failure.retryAfterSeconds / 60));
+    return t("login.locked").replace("{n}", String(minutes));
+  }
+
+  if (failure.status === "invalid-credentials") {
+    const attempts =
+      failure.remainingAttempts !== null
+        ? ` ${t("login.attempts").replace("{n}", String(failure.remainingAttempts))}`
+        : "";
+    return `${t("login.error")}.${attempts}`;
+  }
+
+  return t("login.unavailable");
+}
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [failure, setFailure] = useState<LoginFailure | null>(null);
+  const errorMessage = useLoginFailureMessage(failure);
+  const error = failure !== null;
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, sessionEndReason } = useAuth();
   const { t } = useLanguage();
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const authenticated = await login(email, password);
+    const result = await login(email, password);
     setIsSubmitting(false);
 
-    if (authenticated) {
+    if (result.status === "authenticated") {
       window.history.pushState({}, "", "/dashboard");
       window.dispatchEvent(new PopStateEvent("popstate"));
     } else {
-      setError(true);
+      setFailure(result);
     }
   };
 
@@ -86,7 +111,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(event) => {
                   setEmail(event.target.value);
-                  setError(false);
+                  setFailure(null);
                 }}
                 placeholder="email@teste.com"
               />
@@ -101,15 +126,21 @@ export default function LoginPage() {
                 value={password}
                 onChange={(event) => {
                   setPassword(event.target.value);
-                  setError(false);
+                  setFailure(null);
                 }}
                 placeholder="123"
               />
             </Field>
 
-            {error && (
+            {sessionEndReason === "idle" && !error && (
+              <SessionNotice role="status">
+                {t("login.sessionIdle")}
+              </SessionNotice>
+            )}
+
+            {errorMessage && (
               <ErrorMessage id="login-error" role="alert">
-                {t("login.error")}
+                {errorMessage}
               </ErrorMessage>
             )}
 

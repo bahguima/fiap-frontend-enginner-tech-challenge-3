@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { Line } from "react-chartjs-2";
+import { TrendLineChartSuspense } from "@dashboard/components/dashboard/TrendLineChart/lazy";
 import { TransactionTable } from "@dashboard/components/dashboard/TransactionTable";
 import { QueryState } from "@banking/shared/ui/components/QueryState";
 import { useLanguage } from "@dashboard/contexts/LanguageContext";
@@ -22,6 +22,7 @@ import {
 } from "@banking/shared/ui/styles/shared";
 
 import { ChartPanel, ExpenseValue, SummaryLabel, SummaryPanel } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export default function ExpensesPage() {
   const { t } = useLanguage();
@@ -93,7 +94,7 @@ export default function ExpensesPage() {
         <SummaryPanel>
           <SummaryLabel>{t("expenses.total")}</SummaryLabel>
           <ExpenseValue>
-            -{summaryQuery.data.totalExpense.formattedValue}
+            -<SensitiveValue>{summaryQuery.data.totalExpense.formattedValue}</SensitiveValue>
           </ExpenseValue>
         </SummaryPanel>
       )}
@@ -112,11 +113,7 @@ export default function ExpensesPage() {
         )}
         {monthlyQuery.data && (
           <ChartBox $height="14rem">
-            <Line
-              aria-hidden="true"
-              data={chartData}
-              options={chartOptions}
-            />
+            <TrendLineChartSuspense data={chartData} options={chartOptions} />
           </ChartBox>
         )}
         {monthlyQuery.data && (
@@ -133,55 +130,55 @@ export default function ExpensesPage() {
               <tr>
                 <th scope="row">{monthlyQuery.data.firstPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.firstPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.firstPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.firstPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.firstPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
               <tr>
                 <th scope="row">{monthlyQuery.data.secondPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.secondPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.secondPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.secondPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.secondPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
               <tr>
                 <th scope="row">{monthlyQuery.data.thirdPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.thirdPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.thirdPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.thirdPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.thirdPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
               <tr>
                 <th scope="row">{monthlyQuery.data.fourthPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.fourthPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.fourthPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.fourthPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.fourthPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
               <tr>
                 <th scope="row">{monthlyQuery.data.fifthPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.fifthPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.fifthPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.fifthPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.fifthPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
               <tr>
                 <th scope="row">{monthlyQuery.data.sixthPeriod.label}</th>
                 <td>
-                  {monthlyQuery.data.sixthPeriod.income.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.sixthPeriod.income.formattedValue}</SensitiveValue>
                 </td>
                 <td>
-                  {monthlyQuery.data.sixthPeriod.expense.formattedValue}
+                  <SensitiveValue>{monthlyQuery.data.sixthPeriod.expense.formattedValue}</SensitiveValue>
                 </td>
               </tr>
             </tbody>

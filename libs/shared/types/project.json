@@ -3,7 +3,7 @@
   "name": "shared-types",
   "sourceRoot": "libs/shared/types/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:types"],
+  "tags": ["type:shared", "scope:shared", "layer:domain"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",

@@ -28,7 +28,12 @@ RUN npm run build:institutional
 
 FROM nginx:1.27-alpine AS production
 
-COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+# CSP: origens permitidas além da própria (ver docker/nginx.conf). O
+# envsubst da imagem oficial gera /etc/nginx/conf.d/default.conf na partida.
+ENV CSP_REMOTE_ORIGINS=""
+ENV CSP_API_ORIGIN=""
+
+COPY docker/nginx.conf /etc/nginx/templates/default.conf.template
 COPY --from=build /workspace/apps/institutional/dist /usr/share/nginx/html
 
 EXPOSE 8080

@@ -6,6 +6,8 @@ import type {
 
 export interface ITransactionListUrlState {
   filters: TransactionListFilters;
+  /** Revisão incrementada quando os filtros mudam fora do formulário. */
+  formRevision: number;
   hasActiveFilters: boolean;
   applyFilters: (filters: TransactionListFilters) => void;
   clearFilters: () => void;

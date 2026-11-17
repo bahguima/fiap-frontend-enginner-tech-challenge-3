@@ -7,5 +7,8 @@ export interface CategoriesApi {
 }
 
 export const categoriesApi: CategoriesApi = {
-  list: () => restClient.request<CategoryListResponse>(apiEndpoints.categories.list),
+  list: () =>
+    restClient.request<CategoryListResponse>(apiEndpoints.categories.list, {
+      conditional: true,
+    }),
 };

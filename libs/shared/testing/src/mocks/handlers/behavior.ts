@@ -1,8 +1,17 @@
 import { delay, HttpResponse } from "msw";
-import type { ApiErrorCode, ApiErrorResponse } from "@banking/shared/types";
+import type {
+  ApiErrorCode,
+  ApiErrorMeta,
+  ApiErrorResponse,
+} from "@banking/shared/types";
 
 const DEFAULT_DELAY_MS = 150;
 const MAX_DELAY_MS = 10000;
+
+export interface MockErrorExtras {
+  meta?: ApiErrorMeta;
+  headers?: HeadersInit;
+}
 
 export interface MockErrorOptions {
   status: number;
@@ -30,6 +39,7 @@ export function createErrorResponse(
   code: ApiErrorCode,
   message: string,
   details?: Record<string, string[]>,
+  extras: MockErrorExtras = {},
 ) {
   return HttpResponse.json<ApiErrorResponse>(
     {
@@ -37,9 +47,10 @@ export function createErrorResponse(
         code,
         message,
         details,
+        meta: extras.meta,
       },
     },
-    { status },
+    { status, headers: extras.headers },
   );
 }
 

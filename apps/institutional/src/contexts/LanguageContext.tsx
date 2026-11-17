@@ -286,6 +286,26 @@ const t: Translations = {
     en: "Invalid email or password",
     es: "Correo o contraseña inválidos",
   },
+  "login.attempts": {
+    pt: "Tentativas restantes antes do bloqueio: {n}.",
+    en: "Attempts left before your access is locked: {n}.",
+    es: "Intentos restantes antes del bloqueo: {n}.",
+  },
+  "login.locked": {
+    pt: "Muitas tentativas inválidas. Por segurança, o acesso foi bloqueado. Tente novamente em {n} minutos.",
+    en: "Too many invalid attempts. For your security, access was locked. Try again in {n} minutes.",
+    es: "Demasiados intentos inválidos. Por seguridad, el acceso fue bloqueado. Inténtelo de nuevo en {n} minutos.",
+  },
+  "login.sessionIdle": {
+    pt: "Sessão encerrada por inatividade",
+    en: "Session ended due to inactivity",
+    es: "Sesión finalizada por inactividad",
+  },
+  "login.unavailable": {
+    pt: "Não foi possível entrar agora. Tente novamente em instantes.",
+    en: "We could not sign you in right now. Please try again shortly.",
+    es: "No fue posible iniciar sesión ahora. Inténtelo de nuevo en unos instantes.",
+  },
 
   // Dashboard
   "dash.brand": { pt: "ByteBank", en: "ByteBank", es: "ByteBank" },

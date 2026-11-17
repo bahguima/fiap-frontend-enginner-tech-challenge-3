@@ -1,12 +1,14 @@
+import { Suspense } from "react";
 import type { IDashboardAppProps } from "./interface";
 import { LanguageProvider } from "@dashboard/contexts/LanguageContext";
 import { ThemeProvider } from "@dashboard/contexts/ThemeContext";
+import { TransactionUseCasesProvider } from "@dashboard/features/transactions/di/TransactionUseCasesProvider";
+import { PageFallback } from "@dashboard/components/dashboard/PageFallback";
+import {
+  dashboardPages,
+  resolveDashboardRoute,
+} from "@dashboard/routes/dashboardRoutes";
 import DashboardLayout from "@dashboard/views/dashboard/DashboardLayout";
-import ExpensesPage from "@dashboard/views/dashboard/ExpensesPage";
-import IncomePage from "@dashboard/views/dashboard/IncomePage";
-import OverviewPage from "@dashboard/views/dashboard/OverviewPage";
-import ProfilePage from "@dashboard/views/dashboard/ProfilePage";
-import StatementPage from "@dashboard/views/dashboard/StatementPage";
 import { GlobalStyle } from "@dashboard/styles/global";
 import { DashboardRoot } from "./styled";
 
@@ -15,24 +17,22 @@ export const DashboardApp = ({
   loginUrl = "/login",
   "data-testid": dataTestId,
 }: IDashboardAppProps) => {
-  let page = <OverviewPage />;
-
-  if (pathname === "/dashboard/statement") {
-    page = <StatementPage />;
-  } else if (pathname === "/dashboard/income") {
-    page = <IncomePage />;
-  } else if (pathname === "/dashboard/expenses") {
-    page = <ExpensesPage />;
-  } else if (pathname === "/dashboard/profile") {
-    page = <ProfilePage />;
-  }
+  // Cada página é um chunk carregado sob demanda; o layout (sidebar e
+  // cabeçalho) permanece visível enquanto o fallback ocupa a área principal.
+  const Page = dashboardPages[resolveDashboardRoute(pathname)];
 
   return (
     <ThemeProvider>
       <LanguageProvider>
         <GlobalStyle />
         <DashboardRoot data-testid={dataTestId}>
-          <DashboardLayout loginUrl={loginUrl}>{page}</DashboardLayout>
+          <TransactionUseCasesProvider>
+            <DashboardLayout loginUrl={loginUrl}>
+              <Suspense fallback={<PageFallback />}>
+                <Page />
+              </Suspense>
+            </DashboardLayout>
+          </TransactionUseCasesProvider>
         </DashboardRoot>
       </LanguageProvider>
     </ThemeProvider>

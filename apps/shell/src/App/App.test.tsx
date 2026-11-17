@@ -4,6 +4,8 @@ import { App } from ".";
 
 jest.mock("../mf", () => ({
   loadRemoteComponent: jest.fn(),
+  loadRemoteComponentOnce: jest.fn(),
+  preloadDashboard: jest.fn(),
 }));
 jest.mock("@banking/shared/auth", () => ({
   useAuth: jest.fn(),
@@ -32,7 +34,8 @@ describe("Shell", () => {
     jest.mocked(useAuth).mockReturnValue({
       user: { name: "Fulano", email: "email@teste.com" },
       isLoading: false,
-      login: jest.fn(async () => true),
+    sessionEndReason: null,
+      login: jest.fn(async () => ({ status: "authenticated" as const })),
       logout: jest.fn(async () => {}),
     });
   });
@@ -84,7 +87,8 @@ describe("Shell", () => {
     jest.mocked(useAuth).mockReturnValue({
       user: null,
       isLoading: false,
-      login: jest.fn(async () => false),
+    sessionEndReason: null,
+      login: jest.fn(async () => ({ status: "error" as const })),
       logout: jest.fn(async () => {}),
     });
     const institutionalLoader = jest.fn(async () => InstitutionalRemote);

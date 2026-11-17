@@ -1,20 +1,51 @@
 import { useEffect, useRef, useState } from "react";
-import type { MouseEvent } from "react";
+import type { MouseEvent, SyntheticEvent } from "react";
 import { useAuth } from "@banking/shared/auth";
 import { RemoteSlot } from "../components/RemoteSlot";
-import { loadRemoteComponent } from "../mf";
+import {
+  loadRemoteComponent,
+  loadRemoteComponentOnce,
+  preloadDashboard,
+} from "../mf";
 import type { IAppProps } from "./interface";
 import { ShellMain } from "./styled";
 
 const loadInstitutional = () =>
   loadRemoteComponent("institutional", "App");
 
-const loadDashboard = () => loadRemoteComponent("dashboard", "App");
+// Reaproveita o carregamento iniciado pelo pré-carregamento, se houver.
+const loadDashboard = () => loadRemoteComponentOnce("dashboard", "App");
+
+/**
+ * Indica intenção de entrar no dashboard: links para `/login` ou
+ * `/dashboard/*` (CTAs "Entrar") e o botão de envio do formulário de login.
+ */
+const isDashboardIntentTarget = (
+  target: EventTarget,
+  activePathname: string,
+) => {
+  if (!(target instanceof Element)) return false;
+
+  const anchor = target.closest("a");
+
+  if (anchor !== null) {
+    return (
+      anchor.origin === window.location.origin &&
+      (anchor.pathname === "/login" || anchor.pathname.startsWith("/dashboard"))
+    );
+  }
+
+  return (
+    activePathname === "/login" &&
+    target.closest('button[type="submit"]') !== null
+  );
+};
 
 export const App = ({
   pathname,
   institutionalLoader = loadInstitutional,
   dashboardLoader = loadDashboard,
+  dashboardPreloader = preloadDashboard,
   "data-testid": dataTestId,
 }: IAppProps) => {
   const initialPathname = useRef(
@@ -60,6 +91,22 @@ export const App = ({
     window.dispatchEvent(new PopStateEvent("popstate"));
   }, [activePathname, isLoading, pathname, user]);
 
+  // Login com sucesso (ou sessão restaurada fora do dashboard): a próxima
+  // rota provável é o dashboard, então o remote começa a ser baixado já.
+  useEffect(() => {
+    if (user !== null && !isDashboardRoute) {
+      dashboardPreloader();
+    }
+  }, [dashboardPreloader, isDashboardRoute, user]);
+
+  const handleDashboardIntent = (event: SyntheticEvent<HTMLElement>) => {
+    if (isDashboardRoute) return;
+
+    if (isDashboardIntentTarget(event.target, activePathname)) {
+      dashboardPreloader();
+    }
+  };
+
   const handleNavigation = (event: MouseEvent<HTMLElement>) => {
     if (!(event.target instanceof Element)) return;
 
@@ -80,7 +127,12 @@ export const App = ({
   };
 
   return (
-    <ShellMain data-testid={dataTestId} onClick={handleNavigation}>
+    <ShellMain
+      data-testid={dataTestId}
+      onClick={handleNavigation}
+      onMouseOver={handleDashboardIntent}
+      onFocus={handleDashboardIntent}
+    >
       {isDashboardRoute && isLoading ? (
         <p role="status">Verificando sessão...</p>
       ) : canLoadDashboard ? (

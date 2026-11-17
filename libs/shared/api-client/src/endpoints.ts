@@ -3,6 +3,8 @@ export interface ApiEndpoints {
     login: string;
     logout: string;
     session: string;
+    refresh: string;
+    csrf: string;
   };
   dashboard: {
     home: string;
@@ -28,6 +30,8 @@ export const apiEndpoints: ApiEndpoints = {
     login: "/api/auth/login",
     logout: "/api/auth/logout",
     session: "/api/auth/session",
+    refresh: "/api/auth/refresh",
+    csrf: "/api/auth/csrf",
   },
   dashboard: {
     home: "/api/dashboard/home",
@@ -54,6 +58,8 @@ export const mockApiEndpoints = {
     login: "/api/auth/login",
     logout: "/api/auth/logout",
     session: "/api/auth/session",
+    refresh: "/api/auth/refresh",
+    csrf: "/api/auth/csrf",
   },
   dashboard: {
     home: "/api/dashboard/home",

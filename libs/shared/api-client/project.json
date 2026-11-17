@@ -3,7 +3,7 @@
   "name": "shared-api-client",
   "sourceRoot": "libs/shared/api-client/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:data-access"],
+  "tags": ["type:shared", "scope:shared", "layer:infrastructure"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",

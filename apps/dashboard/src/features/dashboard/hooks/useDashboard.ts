@@ -1,34 +1,20 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { dashboardApi } from "@banking/shared/api-client/dashboard";
-import { profileApi } from "@banking/shared/api-client/profile";
-import { dashboardQueryKeys } from "../api/queryKeys";
+import { dashboardQueries } from "../api/queryOptions";
 
 export function useDashboardHomeQuery() {
-  return useQuery({
-    queryKey: dashboardQueryKeys.home(),
-    queryFn: ({ signal }) => dashboardApi.getHome(signal),
-  });
+  return useQuery(dashboardQueries.home());
 }
 
 export function useDashboardSummaryQuery() {
-  return useQuery({
-    queryKey: dashboardQueryKeys.summary(),
-    queryFn: ({ signal }) => dashboardApi.getSummary(signal),
-  });
+  return useQuery(dashboardQueries.summary());
 }
 
 export function useDashboardMonthlyQuery() {
-  return useQuery({
-    queryKey: dashboardQueryKeys.monthly(),
-    queryFn: ({ signal }) => dashboardApi.getMonthly(signal),
-  });
+  return useQuery(dashboardQueries.monthly());
 }
 
 export function useProfileQuery() {
-  return useQuery({
-    queryKey: dashboardQueryKeys.profile(),
-    queryFn: ({ signal }) => profileApi.get(signal),
-  });
+  return useQuery(dashboardQueries.profile());
 }

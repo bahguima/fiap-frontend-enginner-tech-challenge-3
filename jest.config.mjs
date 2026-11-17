@@ -10,6 +10,8 @@ const customJestConfig = {
       "<rootDir>/libs/shared/api-client/src/index.ts",
     "^@banking/shared/api-client/(.*)$":
       "<rootDir>/libs/shared/api-client/src/$1",
+    "^@banking/shared/application$":
+      "<rootDir>/libs/shared/application/src/index.ts",
     "^@banking/shared/auth$":
       "<rootDir>/libs/shared/auth/src/index.ts",
     "^@banking/shared/design-tokens$":
@@ -18,6 +20,10 @@ const customJestConfig = {
       "<rootDir>/libs/shared/domain/src/index.ts",
     "^@banking/shared/query$":
       "<rootDir>/libs/shared/query/src/index.ts",
+    "^@banking/shared/reactive$":
+      "<rootDir>/libs/shared/reactive/src/index.ts",
+    "^@banking/shared/security$":
+      "<rootDir>/libs/shared/security/src/index.ts",
     "^@banking/shared/testing/(.*)$":
       "<rootDir>/libs/shared/testing/src/$1",
     "^@banking/shared/types$":

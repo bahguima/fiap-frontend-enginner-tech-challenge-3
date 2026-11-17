@@ -33,30 +33,26 @@ export const TransactionFilters = ({
   isCategoriesError = false,
   isCategoriesLoading = false,
   isDisabled = false,
+  onChange,
   onClear,
   onSubmit,
 }: ITransactionFiltersProps) => {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const values = readFormValues(event.currentTarget);
+    onSubmit(readFilters(event.currentTarget));
+  };
 
-    onSubmit({
-      search: values.search || undefined,
-      type: values.type || undefined,
-      category: values.category || undefined,
-      startDate: values.startDate || undefined,
-      endDate: values.endDate || undefined,
-      minimumAmount: values.minimumAmount,
-      maximumAmount: values.maximumAmount,
-      sort: values.sort,
-      pageSize: values.pageSize,
-    });
+  // Cada tecla/seleção vira um evento bruto; quem consome decide como
+  // estabilizá-lo (ex.: stream com debounce no extrato).
+  const handleChange = (event: FormEvent<HTMLFormElement>) => {
+    onChange?.(readFilters(event.currentTarget));
   };
 
   return (
     <FiltersForm
       aria-label="Filtros de transações"
       data-testid={dataTestId}
+      onChange={handleChange}
       onSubmit={handleSubmit}
     >
       <FiltersTitle>Buscar e filtrar</FiltersTitle>
@@ -92,6 +88,9 @@ export const TransactionFilters = ({
         <Field>
           <FieldLabel htmlFor="transaction-category">Categoria</FieldLabel>
           <NativeSelect
+            // Recria só este select quando as opções chegam, para aplicar o
+            // valor inicial sem descartar o que já foi digitado no formulário.
+            key={isCategoriesLoading ? "categories-loading" : "categories-ready"}
             defaultValue={filters.category ?? ""}
             disabled={
               isDisabled || isCategoriesLoading || isCategoriesError
@@ -221,6 +220,22 @@ export const TransactionFilters = ({
     </FiltersForm>
   );
 };
+
+function readFilters(form: HTMLFormElement): TransactionListFilters {
+  const values = readFormValues(form);
+
+  return {
+    search: values.search || undefined,
+    type: values.type || undefined,
+    category: values.category || undefined,
+    startDate: values.startDate || undefined,
+    endDate: values.endDate || undefined,
+    minimumAmount: values.minimumAmount,
+    maximumAmount: values.maximumAmount,
+    sort: values.sort,
+    pageSize: values.pageSize,
+  };
+}
 
 function readFormValues(form: HTMLFormElement): ITransactionFilterFormValues {
   return {

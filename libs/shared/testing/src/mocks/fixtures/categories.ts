@@ -8,3 +8,6 @@ export const mockCategories: TransactionCategory[] = [
   { id: "category-5", name: "Investimento", type: "both" },
   { id: "category-6", name: "Outro", type: "both" },
 ];
+
+/** Revisão do catálogo; incremente ao alterar `mockCategories` (gera novo ETag). */
+export const mockCategoriesRevision = 1;

@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "name": "shared-application",
+  "sourceRoot": "libs/shared/application/src",
+  "projectType": "library",
+  "tags": ["type:shared", "scope:shared", "layer:application"],
+  "targets": {
+    "lint": { "executor": "nx:run-commands", "options": { "command": "eslint libs/shared/application --max-warnings=0" } },
+    "typecheck": { "executor": "nx:run-commands", "options": { "command": "tsc --noEmit -p libs/shared/application/tsconfig.json" } },
+    "test": { "executor": "nx:run-commands", "options": { "command": "jest --config jest.config.mjs libs/shared/application --runInBand" } }
+  }
+}

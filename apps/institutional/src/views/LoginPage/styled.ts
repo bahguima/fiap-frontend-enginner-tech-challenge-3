@@ -106,6 +106,16 @@ export const ErrorMessage = styled.p`
   font-size: 0.875rem;
 `;
 
+export const SessionNotice = styled.p`
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: calc(var(--radius) - 4px);
+  background: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  font-size: 0.875rem;
+`;
+
 export const SubmitButton = styled(Button)`
   width: 100%;
 `;

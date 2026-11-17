@@ -40,6 +40,7 @@ import {
   TransactionCell,
   TypeIconBox,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export function TransactionTable({ "data-testid": dataTestId, data, onView, onEdit, onDelete }: TransactionTableProps) {
   const { t } = useLanguage();
@@ -89,7 +90,7 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
                   </AttachmentCount>
                 </MutedCell>
                 <AmountCell $type={transaction.type}>
-                  {transaction.formattedAmount}
+                  <SensitiveValue>{transaction.formattedAmount}</SensitiveValue>
                 </AmountCell>
                 {hasActions && (
                   <ActionsCell>
@@ -118,7 +119,7 @@ export function TransactionTable({ "data-testid": dataTestId, data, onView, onEd
               </div>
             </MobileItemInfo>
             <MobileAmount $type={transaction.type}>
-              {transaction.formattedAmount}
+              <SensitiveValue>{transaction.formattedAmount}</SensitiveValue>
             </MobileAmount>
             {hasActions && (
               <TransactionActionsMenu transaction={transaction} onView={onView} onEdit={onEdit} onDelete={onDelete} />

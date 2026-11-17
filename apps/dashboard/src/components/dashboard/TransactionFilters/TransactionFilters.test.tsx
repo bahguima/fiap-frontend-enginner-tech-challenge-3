@@ -92,6 +92,33 @@ describe("TransactionFilters", () => {
     });
   });
 
+  it("emite os valores brutos a cada alteração para o stream de filtros", () => {
+    const handleChange = jest.fn();
+
+    render(
+      <TransactionFilters
+        categories={categories}
+        filters={{ pageSize: 10, sort: "date-desc" }}
+        onChange={handleChange}
+        onClear={jest.fn()}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    fireEvent.change(
+      screen.getByRole("searchbox", { name: "Buscar por texto" }),
+      { target: { value: "mer" } },
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Tipo" }), {
+      target: { value: "expense" },
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(2);
+    expect(handleChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ search: "mer", type: "expense" }),
+    );
+  });
+
   it("permite limpar os filtros sem submeter o formulário", () => {
     const handleClear = jest.fn();
     const handleSubmit = jest.fn();

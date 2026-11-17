@@ -22,6 +22,7 @@ import {
 import { useAuth } from "@banking/shared/auth";
 import { useLanguage } from "@dashboard/contexts/LanguageContext";
 import { BrandLinkText } from "@banking/shared/ui/styles/shared";
+import { usePrefetchDashboardRoute } from "@dashboard/routes/usePrefetchDashboardRoute";
 
 import type { AppSidebarProps } from "./interface";
 import { BrandArea, LogoutButton } from "./styled";
@@ -31,6 +32,7 @@ export function AppSidebar({ "data-testid": dataTestId }: AppSidebarProps) {
   const collapsed = state === "collapsed";
   const { t } = useLanguage();
   const { logout } = useAuth();
+  const prefetchRoute = usePrefetchDashboardRoute();
 
   const items = [
     { title: t("sidebar.overview"), url: "/dashboard", icon: LayoutDashboard },
@@ -73,6 +75,8 @@ export function AppSidebar({ "data-testid": dataTestId }: AppSidebarProps) {
                       to={item.url}
                       end={item.url === "/dashboard"}
                       aria-label={collapsed ? item.title : undefined}
+                      onMouseEnter={() => prefetchRoute(item.url)}
+                      onFocus={() => prefetchRoute(item.url)}
                     >
                       <item.icon aria-hidden="true" />
                       {!collapsed && <span>{item.title}</span>}

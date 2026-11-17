@@ -10,6 +10,7 @@ import type {
 } from "@banking/shared/types";
 import { isCalendarDateOnOrBefore, getCalendarDateValue } from "@banking/shared/domain";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
+import { guardProtectedRequest } from "./security";
 import {
   createMockTransaction,
   deleteMockTransaction,
@@ -29,6 +30,8 @@ export const transactionHandlers = [
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       const url = new URL(request.url);
       const filters = createFilters(url);
@@ -42,6 +45,8 @@ export const transactionHandlers = [
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       const transaction = await request.json();
       const validationError = validateTransaction(transaction);
@@ -62,6 +67,8 @@ export const transactionHandlers = [
     async ({ params, request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       const transaction = await request.json();
       const validationError = validateTransaction(transaction);
@@ -92,6 +99,8 @@ export const transactionHandlers = [
     async ({ params, request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       if (!deleteMockTransaction(params.transactionId)) {
         return createErrorResponse(

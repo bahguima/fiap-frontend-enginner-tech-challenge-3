@@ -3,7 +3,7 @@
   "name": "shared-auth",
   "sourceRoot": "libs/shared/auth/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:feature"],
+  "tags": ["type:shared", "scope:shared", "layer:infrastructure"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",

@@ -12,7 +12,7 @@ import type {
 import OverviewPage from ".";
 
 const renderPage = () => {
-  const queryClient = createQueryClient();
+  const queryClient = createQueryClient({ queries: { retry: false } });
 
   return render(
     <QueryClientProvider client={queryClient}>
