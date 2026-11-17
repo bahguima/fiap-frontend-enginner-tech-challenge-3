@@ -1,2 +1,0 @@
-import type { ITransactionFormModalProps } from "./interface";
-export declare const TransactionFormModal: ({ "data-testid": dataTestId, mode, open, transaction, categories, existingAttachments, isCategoriesError, isCategoriesLoading, isExistingAttachmentsError, isExistingAttachmentsLoading, isRemovingAttachment, onOpenChange, onRemoveExistingAttachment, onSubmit, errorMessage, isSubmitting, }: ITransactionFormModalProps) => import("react/jsx-runtime").JSX.Element;

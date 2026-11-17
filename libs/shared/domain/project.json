@@ -3,7 +3,7 @@
   "name": "shared-domain",
   "sourceRoot": "libs/shared/domain/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:types"],
+  "tags": ["type:shared", "scope:shared", "layer:domain"],
   "targets": {
     "lint": { "executor": "nx:run-commands", "options": { "command": "eslint libs/shared/domain --max-warnings=0" } },
     "typecheck": { "executor": "nx:run-commands", "options": { "command": "tsc --noEmit -p libs/shared/domain/tsconfig.json" } },

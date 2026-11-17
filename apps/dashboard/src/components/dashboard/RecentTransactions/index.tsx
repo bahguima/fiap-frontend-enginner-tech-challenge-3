@@ -11,6 +11,7 @@ import {
   TableWrap,
   TransactionsTable,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export const RecentTransactions = ({
   recentTransactions,
@@ -61,7 +62,7 @@ export const RecentTransactions = ({
                   <AmountCell
                     $type={recentTransactions.firstTransaction.type}
                   >
-                    {recentTransactions.firstTransaction.formattedAmount}
+                    <SensitiveValue>{recentTransactions.firstTransaction.formattedAmount}</SensitiveValue>
                   </AmountCell>
                 </tr>
               )}
@@ -82,7 +83,7 @@ export const RecentTransactions = ({
                   <AmountCell
                     $type={recentTransactions.secondTransaction.type}
                   >
-                    {recentTransactions.secondTransaction.formattedAmount}
+                    <SensitiveValue>{recentTransactions.secondTransaction.formattedAmount}</SensitiveValue>
                   </AmountCell>
                 </tr>
               )}
@@ -103,7 +104,7 @@ export const RecentTransactions = ({
                   <AmountCell
                     $type={recentTransactions.thirdTransaction.type}
                   >
-                    {recentTransactions.thirdTransaction.formattedAmount}
+                    <SensitiveValue>{recentTransactions.thirdTransaction.formattedAmount}</SensitiveValue>
                   </AmountCell>
                 </tr>
               )}
@@ -124,7 +125,7 @@ export const RecentTransactions = ({
                   <AmountCell
                     $type={recentTransactions.fourthTransaction.type}
                   >
-                    {recentTransactions.fourthTransaction.formattedAmount}
+                    <SensitiveValue>{recentTransactions.fourthTransaction.formattedAmount}</SensitiveValue>
                   </AmountCell>
                 </tr>
               )}
@@ -145,7 +146,7 @@ export const RecentTransactions = ({
                   <AmountCell
                     $type={recentTransactions.fifthTransaction.type}
                   >
-                    {recentTransactions.fifthTransaction.formattedAmount}
+                    <SensitiveValue>{recentTransactions.fifthTransaction.formattedAmount}</SensitiveValue>
                   </AmountCell>
                 </tr>
               )}

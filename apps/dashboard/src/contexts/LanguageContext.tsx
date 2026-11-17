@@ -11,7 +11,6 @@ import type {
 export type { Language } from "./interface";
 
 const t: Translations = {
-  // Navbar
   "nav.features": { pt: "Recursos", en: "Features", es: "Características" },
   "nav.benefits": { pt: "Benefícios", en: "Benefits", es: "Beneficios" },
   "nav.testimonials": {
@@ -22,7 +21,6 @@ const t: Translations = {
   "nav.signin": { pt: "Entrar", en: "Sign In", es: "Iniciar Sesión" },
   "nav.getstarted": { pt: "Começar", en: "Get Started", es: "Empezar" },
 
-  // Hero
   "hero.badge": {
     pt: "Criptografia bancária · Mais de 50.000 usuários",
     en: "Bank-grade encryption · 50,000+ users",
@@ -71,7 +69,6 @@ const t: Translations = {
     es: "+12,4% este mes",
   },
 
-  // Features
   "features.title1": { pt: "Feito para", en: "Built for", es: "Hecho para" },
   "features.title2": { pt: "Você", en: "You", es: "Ti" },
   "features.subtitle": {
@@ -140,7 +137,6 @@ const t: Translations = {
     es: "Experiencia bancaria completa optimizada para todos los dispositivos, donde vayas.",
   },
 
-  // Benefits
   "benefits.title1": {
     pt: "Por que Escolher o",
     en: "Why Choose",
@@ -182,7 +178,6 @@ const t: Translations = {
     es: "Ahorro por redondeo, transferencias programadas y cuentas basadas en metas que trabajan para ti.",
   },
 
-  // Testimonials
   "testimonials.title1": {
     pt: "Confiado por",
     en: "Trusted by",
@@ -236,7 +231,6 @@ const t: Translations = {
   },
   "testimonials.3.role": { pt: "Designer", en: "Designer", es: "Diseñadora" },
 
-  // CTA
   "cta.title": {
     pt: "Pronto para Elevar suas Finanças?",
     en: "Ready to Elevate Your Finances?",
@@ -249,7 +243,6 @@ const t: Translations = {
   },
   "cta.button": { pt: "Começar Agora", en: "Start Now", es: "Empezar Ahora" },
 
-  // Footer
   "footer.rights": {
     pt: "© 2026 ByteBank. Todos os direitos reservados.",
     en: "© 2026 ByteBank. All rights reserved.",
@@ -257,7 +250,6 @@ const t: Translations = {
   },
   "footer.trust": { pt: "Confiança", en: "Trust", es: "Confianza" },
 
-  // Login
   "login.title": {
     pt: "Bem-vindo de volta",
     en: "Welcome back",
@@ -287,9 +279,23 @@ const t: Translations = {
     es: "Correo o contraseña inválidos",
   },
 
-  // Dashboard
   "dash.brand": { pt: "ByteBank", en: "ByteBank", es: "ByteBank" },
   "dash.hello": { pt: "Olá, Fulano", en: "Hello, Fulano", es: "Hola, Fulano" },
+  "dash.hideValues": {
+    pt: "Ocultar valores",
+    en: "Hide amounts",
+    es: "Ocultar valores",
+  },
+  "dash.valueHidden": {
+    pt: "Valor oculto",
+    en: "Amount hidden",
+    es: "Valor oculto",
+  },
+  "dash.offline": {
+    pt: "Você está offline. Os dados exibidos podem estar desatualizados até a conexão voltar.",
+    en: "You are offline. The data shown may be outdated until the connection is back.",
+    es: "Estás sin conexión. Los datos mostrados pueden estar desactualizados hasta que vuelva la conexión.",
+  },
   "dash.overview": { pt: "Painel", en: "Dashboard", es: "Panel" },
   "dash.overview.subtitle": {
     pt: "Bem-vindo de volta. Aqui está sua visão financeira.",
@@ -323,7 +329,6 @@ const t: Translations = {
     es: "Últimas Transacciones",
   },
 
-  // Sidebar
   "sidebar.overview": {
     pt: "Visão Geral",
     en: "Overview",
@@ -335,7 +340,6 @@ const t: Translations = {
   "sidebar.profile": { pt: "Perfil", en: "Profile", es: "Perfil" },
   "sidebar.logout": { pt: "Sair", en: "Logout", es: "Cerrar Sesión" },
 
-  // Statement page
   "statement.title": { pt: "Extrato", en: "Statement", es: "Extracto" },
   "statement.subtitle": {
     pt: "Histórico completo de transações da sua conta.",
@@ -343,7 +347,6 @@ const t: Translations = {
     es: "Historial completo de transacciones de su cuenta.",
   },
 
-  // Income page
   "income.title": { pt: "Entrada", en: "Income", es: "Ingresos" },
   "income.subtitle": {
     pt: "Todos os recursos recebidos e fontes de receita.",
@@ -366,7 +369,6 @@ const t: Translations = {
     es: "Transacciones de Ingreso",
   },
 
-  // Expenses page
   "expenses.title": { pt: "Saída", en: "Expenses", es: "Gastos" },
   "expenses.subtitle": {
     pt: "Acompanhe para onde seu dinheiro vai.",
@@ -389,7 +391,6 @@ const t: Translations = {
     es: "Transacciones de Gasto",
   },
 
-  // Profile
   "profile.title": { pt: "Perfil", en: "Profile", es: "Perfil" },
   "profile.subtitle": {
     pt: "Gerencie suas informações pessoais.",
@@ -409,7 +410,6 @@ const t: Translations = {
   "profile.light": { pt: "Claro", en: "Light", es: "Claro" },
   "profile.language": { pt: "Idioma", en: "Language", es: "Idioma" },
 
-  // Table headers
   "table.transaction": {
     pt: "Transação",
     en: "Transaction",

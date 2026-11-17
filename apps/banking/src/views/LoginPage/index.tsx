@@ -43,10 +43,10 @@ export default function LoginPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsSubmitting(true);
-    const authenticated = await login(email, password);
+    const result = await login(email, password);
     setIsSubmitting(false);
 
-    if (authenticated) {
+    if (result.status === "authenticated") {
       router.push("/dashboard");
     } else {
       setError(true);

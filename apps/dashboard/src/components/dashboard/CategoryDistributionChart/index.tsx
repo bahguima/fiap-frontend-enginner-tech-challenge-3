@@ -11,6 +11,7 @@ import {
   Fill,
   Track,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export const CategoryDistributionChart = ({
   distribution,
@@ -109,27 +110,27 @@ export const CategoryDistributionChart = ({
       <tbody>
         <tr>
           <th scope="row">{distribution.firstCategory.label}</th>
-          <td>{distribution.firstCategory.amount.formattedValue}</td>
+          <td><SensitiveValue>{distribution.firstCategory.amount.formattedValue}</SensitiveValue></td>
           <td>{distribution.firstCategory.formattedPercentage}</td>
         </tr>
         <tr>
           <th scope="row">{distribution.secondCategory.label}</th>
-          <td>{distribution.secondCategory.amount.formattedValue}</td>
+          <td><SensitiveValue>{distribution.secondCategory.amount.formattedValue}</SensitiveValue></td>
           <td>{distribution.secondCategory.formattedPercentage}</td>
         </tr>
         <tr>
           <th scope="row">{distribution.thirdCategory.label}</th>
-          <td>{distribution.thirdCategory.amount.formattedValue}</td>
+          <td><SensitiveValue>{distribution.thirdCategory.amount.formattedValue}</SensitiveValue></td>
           <td>{distribution.thirdCategory.formattedPercentage}</td>
         </tr>
         <tr>
           <th scope="row">{distribution.fourthCategory.label}</th>
-          <td>{distribution.fourthCategory.amount.formattedValue}</td>
+          <td><SensitiveValue>{distribution.fourthCategory.amount.formattedValue}</SensitiveValue></td>
           <td>{distribution.fourthCategory.formattedPercentage}</td>
         </tr>
         <tr>
           <th scope="row">{distribution.fifthCategory.label}</th>
-          <td>{distribution.fifthCategory.amount.formattedValue}</td>
+          <td><SensitiveValue>{distribution.fifthCategory.amount.formattedValue}</SensitiveValue></td>
           <td>{distribution.fifthCategory.formattedPercentage}</td>
         </tr>
       </tbody>

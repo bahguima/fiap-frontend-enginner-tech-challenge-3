@@ -21,7 +21,8 @@ const AuthProbe = () => {
   const [authenticated, setAuthenticated] = useState(false);
 
   const handleLogin = async () => {
-    setAuthenticated(await login("email@teste.com", "123"));
+    const result = await login("email@teste.com", "123");
+    setAuthenticated(result.status === "authenticated");
   };
 
   return (

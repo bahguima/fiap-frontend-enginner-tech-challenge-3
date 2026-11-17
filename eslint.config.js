@@ -4,6 +4,11 @@ import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import tseslint from "typescript-eslint";
 
+const RXJS_MESSAGE =
+  "Importe RxJS somente em libs/shared/reactive; use os hooks de @banking/shared/reactive.";
+const rxjsRestrictedPaths = [{ name: "rxjs", message: RXJS_MESSAGE }];
+const rxjsRestrictedPatterns = [{ group: ["rxjs/*"], message: RXJS_MESSAGE }];
+
 export default tseslint.config(
   {
     ignores: [
@@ -46,44 +51,76 @@ export default tseslint.config(
               sourceTag: "type:app",
               onlyDependOnLibsWithTags: ["type:shared"],
             },
+            // Clean Architecture: as dependências apontam sempre para o domínio.
+            // domain -> domain
             {
-              sourceTag: "layer:types",
-              onlyDependOnLibsWithTags: ["layer:types"],
+              sourceTag: "layer:domain",
+              onlyDependOnLibsWithTags: ["layer:domain"],
             },
+            // application -> application, domain (nunca infraestrutura)
             {
-              sourceTag: "layer:ui",
-              onlyDependOnLibsWithTags: ["layer:ui", "layer:types"],
+              sourceTag: "layer:application",
+              onlyDependOnLibsWithTags: ["layer:application", "layer:domain"],
             },
+            // infrastructure -> infrastructure, application, domain
             {
-              sourceTag: "layer:data-access",
+              sourceTag: "layer:infrastructure",
               onlyDependOnLibsWithTags: [
-                "layer:data-access",
-                "layer:types",
+                "layer:infrastructure",
+                "layer:application",
+                "layer:domain",
               ],
             },
+            // presentation -> presentation, application, domain
             {
-              sourceTag: "layer:feature",
+              sourceTag: "layer:presentation",
               onlyDependOnLibsWithTags: [
-                "layer:feature",
-                "layer:data-access",
-                "layer:types",
-                "layer:ui",
-              ],
-            },
-            {
-              sourceTag: "layer:testing",
-              onlyDependOnLibsWithTags: [
-                "layer:testing",
-                "layer:data-access",
-                "layer:types",
-                "layer:ui",
-                "layer:feature",
+                "layer:presentation",
+                "layer:application",
+                "layer:domain",
               ],
             },
           ],
         },
       ],
       "@typescript-eslint/no-unused-vars": "off",
+      // RxJS fica confinado a libs/shared/reactive (ver AGENTS.md).
+      "no-restricted-imports": [
+        "error",
+        { paths: rxjsRestrictedPaths, patterns: rxjsRestrictedPatterns },
+      ],
+    },
+  },
+  // Web federada: `@banking/shared/api-client` é singleton no share scope
+  // (sessão em memória). Importar subcaminhos criaria uma segunda instância
+  // do cliente HTTP dentro do remote, com outro store de tokens.
+  {
+    files: ["apps/{shell,dashboard,institutional}/src/**/*.{ts,tsx}"],
+    ignores: ["**/*.test.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: rxjsRestrictedPaths,
+          patterns: [
+            ...rxjsRestrictedPatterns,
+            {
+              group: [
+                "@banking/shared/api-client/*",
+                "!@banking/shared/api-client/endpoints",
+              ],
+              message:
+                "Importe de @banking/shared/api-client (raiz, singleton federado).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["libs/shared/reactive/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": "off",
     },
   },
 );

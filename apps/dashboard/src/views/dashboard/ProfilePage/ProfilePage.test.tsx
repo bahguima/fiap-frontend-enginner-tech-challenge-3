@@ -10,7 +10,7 @@ import ProfilePage from ".";
 
 const renderPage = () =>
   render(
-    <QueryClientProvider client={createQueryClient()}>
+    <QueryClientProvider client={createQueryClient({ queries: { retry: false } })}>
       <LanguageProvider>
         <ProfilePage />
       </LanguageProvider>

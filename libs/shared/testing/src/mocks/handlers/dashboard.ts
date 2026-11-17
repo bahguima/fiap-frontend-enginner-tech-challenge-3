@@ -6,6 +6,7 @@ import type {
   DashboardSummaryResponse,
 } from "@banking/shared/types";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
+import { guardProtectedRequest } from "./security";
 import {
   mockDashboardHomeEmpty,
   mockDashboardMonthly,
@@ -19,6 +20,8 @@ export const dashboardHandlers = [
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       const requestUrl = new URL(request.url);
 
@@ -34,6 +37,8 @@ export const dashboardHandlers = [
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       return HttpResponse.json<DashboardSummaryResponse>(
         getMockDashboardSummary(),
@@ -45,6 +50,8 @@ export const dashboardHandlers = [
     async ({ request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       return HttpResponse.json<DashboardMonthlyResponse>(mockDashboardMonthly);
     },

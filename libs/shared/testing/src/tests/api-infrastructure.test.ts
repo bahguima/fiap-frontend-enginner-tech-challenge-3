@@ -12,27 +12,32 @@ import {
 import type { CategoryListResponse } from "@banking/shared/types";
 import { apiEndpoints } from "@banking/shared/api-client/endpoints";
 import { server } from "../mocks/server";
+import { signOutTestSession } from "../testSession";
 
 describe("infraestrutura da API REST mockada", () => {
   it("mantém o ciclo de autenticação e rejeita credenciais inválidas", async () => {
+    signOutTestSession();
     await expect(authApi.getSession()).resolves.toEqual({
       authenticated: false,
       user: null,
     });
 
-    const login = await authApi.login({
+    const session = await authApi.login({
       email: "email@teste.com",
       password: "123",
     });
 
-    expect(login).not.toHaveProperty("accessToken");
-    expect(login.session.user).toMatchObject({
+    // O access token fica no store em memória; a fachada não o devolve.
+    expect(session).not.toHaveProperty("accessToken");
+    expect(session.user).toMatchObject({
       name: "Fulano",
       email: "email@teste.com",
     });
-    await expect(authApi.getSession()).resolves.toEqual(login.session);
-    await expect(authApi.logout()).resolves.toEqual({
-      message: "Sessão encerrada com sucesso.",
+    await expect(authApi.getSession()).resolves.toEqual(session);
+    await authApi.logout();
+    await expect(authApi.getSession()).resolves.toEqual({
+      authenticated: false,
+      user: null,
     });
     await expect(
       authApi.login({ email: "invalido@teste.com", password: "errada" }),
@@ -330,6 +335,50 @@ describe("infraestrutura da API REST mockada", () => {
     });
   });
 
+  it("revalida categorias com ETag e reaproveita o corpo em 304", async () => {
+    const statuses: number[] = [];
+    const sentEtags: (string | null)[] = [];
+    const client = new RestClient({
+      fetcher: async (input, init) => {
+        sentEtags.push(new Headers(init?.headers).get("If-None-Match"));
+        const response = await fetch(input, init);
+        statuses.push(response.status);
+        return response;
+      },
+    });
+
+    const first = await client.request<CategoryListResponse>(
+      apiEndpoints.categories.list,
+      { conditional: true },
+    );
+    const second = await client.request<CategoryListResponse>(
+      apiEndpoints.categories.list,
+      { conditional: true },
+    );
+
+    expect(statuses).toEqual([200, 304]);
+    expect(sentEtags[0]).toBeNull();
+    expect(sentEtags[1]).toMatch(/^"categories-/);
+    expect(second).toEqual(first);
+    expect(second.items.length).toBeGreaterThan(0);
+  });
+
+  it("não envia If-None-Match sem revalidação condicional", async () => {
+    const statuses: number[] = [];
+    const client = new RestClient({
+      fetcher: async (input, init) => {
+        const response = await fetch(input, init);
+        statuses.push(response.status);
+        return response;
+      },
+    });
+
+    await client.request(apiEndpoints.categories.list);
+    await client.request(apiEndpoints.categories.list);
+
+    expect(statuses).toEqual([200, 200]);
+  });
+
   it("falha em requests não tratados durante os testes", async () => {
     server.use(
       http.get("/api/infra/custom", () =>
@@ -357,7 +406,7 @@ describe("infraestrutura da API REST mockada", () => {
     });
   });
 
-  it("inclui credenciais de sessão nas requisições", async () => {
+  it("inclui cookies (credentials) nas requisições", async () => {
     const fetcher = jest.fn(
       async () =>
         new Response(JSON.stringify({ items: [] }), {

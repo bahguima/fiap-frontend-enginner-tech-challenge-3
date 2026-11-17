@@ -7,6 +7,7 @@ import {
   MetricIconBox,
   MetricLabel,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export const FinancialMetricCard = ({
   metric,
@@ -21,7 +22,7 @@ export const FinancialMetricCard = ({
         <Icon size={18} />
       </MetricIconBox>
     </MetricHeader>
-    <MetricAmount>{metric.amount.formattedValue}</MetricAmount>
+    <MetricAmount><SensitiveValue>{metric.amount.formattedValue}</SensitiveValue></MetricAmount>
     <Comparison $tone={metric.comparisonTone}>
       {metric.comparisonText}
     </Comparison>

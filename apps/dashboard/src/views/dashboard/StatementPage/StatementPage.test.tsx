@@ -1,5 +1,11 @@
 import { QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { delay, http, HttpResponse } from "msw";
 import { apiEndpoints } from "@banking/shared/api-client/endpoints";
 import { createQueryClient } from "@banking/shared/query";
@@ -10,10 +16,12 @@ import type {
   TransactionListResponse,
 } from "@banking/shared/types";
 
+import { TRANSACTION_FILTERS_DEBOUNCE_MS } from "@dashboard/features/transactions/hooks/useTransactionFilterStream";
+
 import StatementPage from ".";
 
 const renderPage = () => {
-  const queryClient = createQueryClient();
+  const queryClient = createQueryClient({ queries: { retry: false } });
 
   return render(
     <QueryClientProvider client={queryClient}>
@@ -253,6 +261,132 @@ describe("StatementPage", () => {
     );
     expect(
       screen.getByRole("button", { name: "Tentar novamente" }),
+    ).toBeInTheDocument();
+  });
+
+  describe("busca reativa", () => {
+    // Mantém microtasks/nextTick reais: o pipeline de fetch do MSW depende deles.
+    beforeEach(() =>
+      jest.useFakeTimers({
+        doNotFake: ["nextTick", "setImmediate", "queueMicrotask"],
+      }),
+    );
+    afterEach(() => jest.useRealTimers());
+
+    const typeSearch = (value: string) =>
+      fireEvent.change(
+        screen.getByRole("searchbox", { name: "Buscar por texto" }),
+        { target: { value } },
+      );
+    const advance = (ms: number) =>
+      act(async () => {
+        await jest.advanceTimersByTimeAsync(ms);
+      });
+
+    it("aplica debounce na digitação e consulta a API uma única vez", async () => {
+      const requestedSearches: (string | null)[] = [];
+      server.use(
+        http.get<never, never, TransactionListResponse>(
+          apiEndpoints.transactions.list,
+          ({ request }) => {
+            const search = new URL(request.url).searchParams.get("search");
+            requestedSearches.push(search);
+            return HttpResponse.json(
+              listMockTransactions({ search: search ?? undefined }),
+            );
+          },
+        ),
+      );
+      renderPage();
+      await screen.findByText("Compra no mercado", { selector: "td" });
+
+      typeSearch("p");
+      await advance(100);
+      typeSearch("pr");
+      await advance(100);
+      typeSearch("projeto");
+      await advance(TRANSACTION_FILTERS_DEBOUNCE_MS - 1);
+
+      expect(window.location.search).toBe("");
+
+      await advance(1);
+
+      expect(new URLSearchParams(window.location.search).get("search")).toBe(
+        "projeto",
+      );
+      expect(
+        await screen.findByText("Pagamento de projeto", { selector: "td" }),
+      ).toBeInTheDocument();
+      expect(requestedSearches).toEqual([null, "projeto"]);
+    });
+
+    it("cancela a requisição obsoleta quando um novo termo estabiliza", async () => {
+      const abortedSearches: string[] = [];
+      server.use(
+        http.get<never, never, TransactionListResponse>(
+          apiEndpoints.transactions.list,
+          async ({ request }) => {
+            const search = new URL(request.url).searchParams.get("search");
+            request.signal.addEventListener("abort", () => {
+              if (search) abortedSearches.push(search);
+            });
+            if (search === "mercado") await delay(5_000);
+
+            return HttpResponse.json(
+              listMockTransactions({ search: search ?? undefined }),
+            );
+          },
+        ),
+      );
+      renderPage();
+      await screen.findByText("Compra no mercado", { selector: "td" });
+
+      typeSearch("mercado");
+      await advance(TRANSACTION_FILTERS_DEBOUNCE_MS);
+      expect(screen.getByText("Atualizando transações...")).toBeInTheDocument();
+
+      typeSearch("projeto");
+      await advance(TRANSACTION_FILTERS_DEBOUNCE_MS);
+
+      await waitFor(() => expect(abortedSearches).toEqual(["mercado"]));
+      expect(
+        await screen.findByText("Pagamento de projeto", { selector: "td" }),
+      ).toBeInTheDocument();
+      expect(new URLSearchParams(window.location.search).get("search")).toBe(
+        "projeto",
+      );
+    });
+
+    it("não reaplica o termo pendente depois de limpar os filtros", async () => {
+      renderPage();
+      await screen.findByText("Compra no mercado", { selector: "td" });
+
+      typeSearch("projeto");
+      await advance(100);
+      fireEvent.click(screen.getByRole("button", { name: "Limpar filtros" }));
+      await advance(TRANSACTION_FILTERS_DEBOUNCE_MS);
+
+      expect(window.location.search).toBe("");
+      expect(
+        screen.getByRole("searchbox", { name: "Buscar por texto" }),
+      ).toHaveValue("");
+    });
+  });
+
+  it("carrega o modal de criação sob demanda, só após a abertura", async () => {
+    renderPage();
+
+    await screen.findByText("Assinatura de streaming", { selector: "td" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    const createButton = screen.getByRole("button", {
+      name: "Nova Transação",
+    });
+    fireEvent.mouseEnter(createButton);
+    fireEvent.click(createButton);
+
+    expect(
+      await screen.findByRole("dialog", { name: "Nova Transação" }),
     ).toBeInTheDocument();
   });
 });

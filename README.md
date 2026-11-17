@@ -153,7 +153,7 @@ O ambiente local força o projeto descartável `demo-bytebank`, evitando fallbac
 
 ```bash
 # terminal 1
-npm run firebase:emulators:start
+npm run firebase:emulators:startnpm run firebase:auth:start
 
 # terminal 2
 npm run firebase:seed

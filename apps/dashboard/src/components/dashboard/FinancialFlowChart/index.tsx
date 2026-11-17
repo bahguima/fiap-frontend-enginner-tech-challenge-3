@@ -12,6 +12,7 @@ import {
   PeriodLabel,
   Plot,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export const FinancialFlowChart = ({
   cashFlow,
@@ -83,33 +84,33 @@ export const FinancialFlowChart = ({
       <tbody>
         <tr>
           <th scope="row">{cashFlow.firstPeriod.label}</th>
-          <td>{cashFlow.firstPeriod.income.formattedValue}</td>
-          <td>{cashFlow.firstPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.firstPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.firstPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
         <tr>
           <th scope="row">{cashFlow.secondPeriod.label}</th>
-          <td>{cashFlow.secondPeriod.income.formattedValue}</td>
-          <td>{cashFlow.secondPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.secondPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.secondPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
         <tr>
           <th scope="row">{cashFlow.thirdPeriod.label}</th>
-          <td>{cashFlow.thirdPeriod.income.formattedValue}</td>
-          <td>{cashFlow.thirdPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.thirdPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.thirdPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
         <tr>
           <th scope="row">{cashFlow.fourthPeriod.label}</th>
-          <td>{cashFlow.fourthPeriod.income.formattedValue}</td>
-          <td>{cashFlow.fourthPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.fourthPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.fourthPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
         <tr>
           <th scope="row">{cashFlow.fifthPeriod.label}</th>
-          <td>{cashFlow.fifthPeriod.income.formattedValue}</td>
-          <td>{cashFlow.fifthPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.fifthPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.fifthPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
         <tr>
           <th scope="row">{cashFlow.sixthPeriod.label}</th>
-          <td>{cashFlow.sixthPeriod.income.formattedValue}</td>
-          <td>{cashFlow.sixthPeriod.expense.formattedValue}</td>
+          <td><SensitiveValue>{cashFlow.sixthPeriod.income.formattedValue}</SensitiveValue></td>
+          <td><SensitiveValue>{cashFlow.sixthPeriod.expense.formattedValue}</SensitiveValue></td>
         </tr>
       </tbody>
     </AccessibleTable>

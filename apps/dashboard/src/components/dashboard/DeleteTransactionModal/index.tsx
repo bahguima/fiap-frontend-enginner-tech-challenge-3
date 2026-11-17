@@ -22,7 +22,10 @@ export function DeleteTransactionModal({
   errorMessage,
   isSubmitting = false,
 }: DeleteTransactionModalProps) {
-  if (!transaction) {
+  // Durante a exclusão otimista a transação já saiu da lista em cache; o
+  // modal continua montado até a mutation terminar (sucesso fecha, erro
+  // restaura a linha e exibe a mensagem).
+  if (!transaction && !isSubmitting) {
     return null;
   }
 

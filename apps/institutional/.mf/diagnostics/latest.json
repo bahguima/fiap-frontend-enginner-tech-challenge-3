@@ -1,10 +1,10 @@
 {
   "latestErrorEvent": {
     "code": "TYPE-001",
-    "message": "Failed to generate type declaration. Execute the below cmd to reproduce and fix the error. #TYPE-001\nargs: {\"cmd\":\"C:\\\\nvm4w\\\\nodejs\\\\node.exe C:\\\\Users\\\\BarbaraStanigher\\\\Documents\\\\GitHub\\\\fiap-frontend-enginner-tech-challenge-1\\\\node_modules\\\\typescript\\\\bin\\\\tsc --project C:\\\\Users\\\\BarbaraStanigher\\\\Documents\\\\GitHub\\\\fiap-frontend-enginner-tech-challenge-1\\\\apps\\\\institutional\\\\node_modules\\\\.federation\\\\tsconfig.f0c049fa0b1a2bce1d6f899adb792a14.json\"}\nView the docs to see how to solve: https://module-federation.io/guide/troubleshooting/type#type-001",
+    "message": "Failed to generate type declaration. Execute the below cmd to reproduce and fix the error. #TYPE-001\nargs: {\"cmd\":\"C:\\\\nvm4w\\\\nodejs\\\\node.exe C:\\\\Users\\\\barba\\\\OneDrive\\\\Documentos\\\\GitHub\\\\fiap-frontend-enginner-tech-challenge-2\\\\node_modules\\\\typescript\\\\bin\\\\tsc --project C:\\\\Users\\\\barba\\\\OneDrive\\\\Documentos\\\\GitHub\\\\fiap-frontend-enginner-tech-challenge-2\\\\apps\\\\institutional\\\\node_modules\\\\.federation\\\\tsconfig.9555640a41d5b166851354a497470d8b.json\"}\nView the docs to see how to solve: https://module-federation.io/guide/troubleshooting/type#type-001",
     "args": {
-      "cmd": "C:\\nvm4w\\nodejs\\node.exe C:\\Users\\BarbaraStanigher\\Documents\\GitHub\\fiap-frontend-enginner-tech-challenge-1\\node_modules\\typescript\\bin\\tsc --project C:\\Users\\BarbaraStanigher\\Documents\\GitHub\\fiap-frontend-enginner-tech-challenge-1\\apps\\institutional\\node_modules\\.federation\\tsconfig.f0c049fa0b1a2bce1d6f899adb792a14.json"
+      "cmd": "C:\\nvm4w\\nodejs\\node.exe C:\\Users\\barba\\OneDrive\\Documentos\\GitHub\\fiap-frontend-enginner-tech-challenge-2\\node_modules\\typescript\\bin\\tsc --project C:\\Users\\barba\\OneDrive\\Documentos\\GitHub\\fiap-frontend-enginner-tech-challenge-2\\apps\\institutional\\node_modules\\.federation\\tsconfig.9555640a41d5b166851354a497470d8b.json"
     },
-    "timestamp": 1785177901719
+    "timestamp": 1794955400304
   }
 }

@@ -24,6 +24,11 @@ describe("Configuração do Module Federation", () => {
         requiredVersion: "0.0.0",
         version: "0.0.0",
       },
+      "@banking/shared/api-client": {
+        singleton: true,
+        requiredVersion: "0.0.0",
+        version: "0.0.0",
+      },
     });
   });
 });

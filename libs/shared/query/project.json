@@ -3,7 +3,7 @@
   "name": "shared-query",
   "sourceRoot": "libs/shared/query/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:data-access"],
+  "tags": ["type:shared", "scope:shared", "layer:application"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",
@@ -15,6 +15,12 @@
       "executor": "nx:run-commands",
       "options": {
         "command": "tsc --noEmit -p libs/shared/query/tsconfig.json"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest --config jest.config.mjs libs/shared/query --runInBand"
       }
     }
   }

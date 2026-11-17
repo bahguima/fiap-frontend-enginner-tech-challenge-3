@@ -8,6 +8,7 @@ import type {
 import { transactionAttachmentPolicy } from "@banking/shared/types";
 import { attachmentMetadataSchema } from "@banking/shared/validation";
 import { mockApiEndpoints } from "@banking/shared/api-client/endpoints";
+import { guardProtectedRequest } from "./security";
 import {
   createMockAttachment,
   deleteMockAttachment,
@@ -34,6 +35,8 @@ export const attachmentHandlers = [
     async ({ params, request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       if (!findMockTransaction(params.transactionId)) {
         return createErrorResponse(
@@ -57,6 +60,8 @@ export const attachmentHandlers = [
     async ({ params, request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       if (!findMockTransaction(params.transactionId)) {
         return createErrorResponse(
@@ -128,6 +133,8 @@ export const attachmentHandlers = [
     async ({ params, request }) => {
       const forcedError = await applyMockBehavior(request, { status: 503 });
       if (forcedError) return forcedError;
+      const denied = guardProtectedRequest(request);
+      if (denied) return denied;
 
       if (!deleteMockAttachment(params.attachmentId)) {
         return createErrorResponse(404, "NOT_FOUND", "Anexo não encontrado.");

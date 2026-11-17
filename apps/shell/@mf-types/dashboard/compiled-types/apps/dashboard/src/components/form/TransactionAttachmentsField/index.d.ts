@@ -1,2 +1,0 @@
-import type { ITransactionAttachmentsFieldProps } from "./interface";
-export declare const TransactionAttachmentsField: ({ "data-testid": dataTestId, existingAttachments, failedAttachments, isExistingAttachmentsError, isExistingAttachmentsLoading, isRemovingAttachment, selectedFiles, validationError, onClearSelectedFiles, onFilesChange, onRemoveExistingAttachment, }: ITransactionAttachmentsFieldProps) => import("react/jsx-runtime").JSX.Element;

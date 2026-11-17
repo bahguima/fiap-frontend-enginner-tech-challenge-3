@@ -12,6 +12,8 @@ export interface ITransactionFiltersProps {
   isCategoriesError?: boolean;
   isCategoriesLoading?: boolean;
   isDisabled?: boolean;
+  /** Valores brutos a cada alteração de campo (ainda não estabilizados). */
+  onChange?: (filters: TransactionListFilters) => void;
   onClear: () => void;
   onSubmit: (filters: TransactionListFilters) => void;
 }

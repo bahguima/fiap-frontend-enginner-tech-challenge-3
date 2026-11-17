@@ -3,7 +3,7 @@
   "name": "shared-testing",
   "sourceRoot": "libs/shared/testing/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:testing"],
+  "tags": ["type:shared", "scope:shared", "layer:infrastructure"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",

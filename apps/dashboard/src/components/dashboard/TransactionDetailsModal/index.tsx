@@ -21,6 +21,7 @@ import {
   DetailsValue,
   RetryAttachmentsButton,
 } from "./styled";
+import { SensitiveValue } from "@dashboard/components/SensitiveValue";
 
 export function TransactionDetailsModal({
   "data-testid": dataTestId,
@@ -67,7 +68,7 @@ export function TransactionDetailsModal({
           </DetailsRow>
           <DetailsRow>
             <DetailsLabel>Valor</DetailsLabel>
-            <DetailsValue>{transaction.formattedAmount}</DetailsValue>
+            <DetailsValue><SensitiveValue>{transaction.formattedAmount}</SensitiveValue></DetailsValue>
           </DetailsRow>
           <DetailsRow>
             <DetailsLabel>Observação</DetailsLabel>

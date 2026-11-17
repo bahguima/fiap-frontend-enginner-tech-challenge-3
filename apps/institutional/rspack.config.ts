@@ -5,18 +5,12 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sharedDependencies } from '../../tools/module-federation/shared';
 
-// __dirname is undefined when @rspack/cli loads this config as ESM (it
-// does, because the file uses `import` statements). Derive it from the
-// module URL so the config works regardless of how the loader interprets it.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = 8101;
 const NAME = 'institutional';
 const WORKSPACE_ROOT = path.resolve(__dirname, '../..');
 
-// Read mode from the rspack CLI arg (`--mode=development|production`) so the
-// config works the same on Windows + POSIX without depending on a shell
-// `NODE_ENV=...` prefix.
 export default defineConfig((_env, argv) => {
   const isDev = argv.mode !== 'production';
   return {
@@ -28,12 +22,17 @@ export default defineConfig((_env, argv) => {
       uniqueName: NAME,
       clean: true,
     },
+    // Lazy compilation não funciona em remotes: o proxy dispara
+    // /_rspack/lazy/trigger relativo à página, que roda na origem do host
+    // (4200), então a compilação nunca acontece e o Suspense fica preso.
+    lazyCompilation: false,
     devServer: {
       host: '0.0.0.0',
       port: PORT,
       historyApiFallback: true,
       hot: true,
       headers: { 'Access-Control-Allow-Origin': '*' },
+      allowedHosts: ['localhost', '127.0.0.1'],
     },
     resolve: {
       extensions: ['...', '.ts', '.tsx', '.jsx'],
@@ -96,9 +95,6 @@ export default defineConfig((_env, argv) => {
       ],
     },
     plugins: [
-      // excludeChunks is REQUIRED on a provider: without it the federation
-      // remoteEntry chunk gets injected into the standalone HTML and breaks
-      // direct serves.
       new rspack.HtmlRspackPlugin({ template: './index.html', excludeChunks: [NAME] }),
       new rspack.DefinePlugin({
         'process.env.NEXT_PUBLIC_API_BASE_URL': JSON.stringify(
@@ -110,6 +106,9 @@ export default defineConfig((_env, argv) => {
         ),
         'process.env.NEXT_PUBLIC_API_MOCK_DELAY_MS': JSON.stringify(
           process.env.NEXT_PUBLIC_API_MOCK_DELAY_MS ?? '150'
+        ),
+        'process.env.NEXT_PUBLIC_API_MOCK_ACCESS_TOKEN_TTL_SECONDS': JSON.stringify(
+          process.env.NEXT_PUBLIC_API_MOCK_ACCESS_TOKEN_TTL_SECONDS ?? '300'
         ),
       }),
       new rspack.CopyRspackPlugin({

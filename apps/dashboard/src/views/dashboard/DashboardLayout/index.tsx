@@ -2,8 +2,11 @@
 
 import { useEffect } from "react";
 import { AppSidebar } from "@dashboard/components/dashboard/AppSidebar";
+import { OfflineBanner } from "@dashboard/components/dashboard/OfflineBanner";
 import { LanguageSelector } from "@dashboard/components/LanguageSelector";
 import { ThemeToggle } from "@dashboard/components/ThemeToggle";
+import { ValuesVisibilityToggle } from "@dashboard/components/ValuesVisibilityToggle";
+import { ValuesVisibilityProvider } from "@dashboard/contexts/ValuesVisibilityContext";
 import { SidebarProvider, SidebarTrigger } from "@banking/shared/ui/components/sidebar";
 import { useAuth } from "@banking/shared/auth";
 import { useLanguage } from "@dashboard/contexts/LanguageContext";
@@ -37,23 +40,27 @@ export default function DashboardLayout({
   if (!user) return null;
 
   return (
-    <SidebarProvider>
-      <DashboardRoot>
-        <AppSidebar />
-        <DashboardBody>
-          <Header>
-            <HeaderStart>
-              <SidebarTrigger />
-              <Greeting>{t("dash.hello")}</Greeting>
-            </HeaderStart>
-            <HeaderActions>
-              <ThemeToggle />
-              <LanguageSelector />
-            </HeaderActions>
-          </Header>
-          <Main>{children}</Main>
-        </DashboardBody>
-      </DashboardRoot>
-    </SidebarProvider>
+    <ValuesVisibilityProvider>
+      <SidebarProvider>
+        <DashboardRoot>
+          <AppSidebar />
+          <DashboardBody>
+            <Header>
+              <HeaderStart>
+                <SidebarTrigger />
+                <Greeting>{t("dash.hello")}</Greeting>
+              </HeaderStart>
+              <HeaderActions>
+                <ValuesVisibilityToggle />
+                <ThemeToggle />
+                <LanguageSelector />
+              </HeaderActions>
+            </Header>
+            <OfflineBanner />
+            <Main>{children}</Main>
+          </DashboardBody>
+        </DashboardRoot>
+      </SidebarProvider>
+    </ValuesVisibilityProvider>
   );
 }

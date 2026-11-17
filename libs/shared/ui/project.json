@@ -3,7 +3,7 @@
   "name": "shared-ui",
   "sourceRoot": "libs/shared/ui/src",
   "projectType": "library",
-  "tags": ["type:shared", "scope:shared", "layer:ui"],
+  "tags": ["type:shared", "scope:shared", "layer:presentation"],
   "targets": {
     "lint": {
       "executor": "nx:run-commands",

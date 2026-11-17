@@ -1,5 +1,4 @@
 import type {
-  AuthSession,
   CreateTransactionRequest,
   DashboardAmount,
   DashboardHomeResponse,
@@ -22,7 +21,7 @@ import {
   transactionToViewModel,
 } from "@banking/shared/domain";
 import { mockAttachments } from "./fixtures/attachments";
-import { mockAuthUser } from "./fixtures/auth";
+import { resetMockAuthState } from "./authState";
 import { mockCategories } from "./fixtures/categories";
 import {
   mockTransactionSeeds,
@@ -30,7 +29,6 @@ import {
 } from "./fixtures/transactions";
 import { mockDashboardHome as mockDashboardHomeFixture } from "./fixtures/dashboard";
 
-let authenticated = false;
 let transactionSequence = 100;
 let attachmentSequence = 100;
 interface StoredTransaction {
@@ -48,27 +46,11 @@ let transactionDocuments: StoredTransaction[] = [];
 let attachments: TransactionAttachment[] = [];
 
 export function resetMockState() {
-  authenticated = false;
+  resetMockAuthState();
   transactionSequence = 100;
   attachmentSequence = 100;
   transactionDocuments = mockTransactionSeeds.map(createTransactionDocumentFromSeed);
   attachments = mockAttachments.map((attachment) => ({ ...attachment }));
-}
-
-export function getMockSession(): AuthSession {
-  return {
-    authenticated,
-    user: authenticated ? mockAuthUser : null,
-  };
-}
-
-export function authenticateMockSession() {
-  authenticated = true;
-  return getMockSession();
-}
-
-export function clearMockSession() {
-  authenticated = false;
 }
 
 export function listMockTransactions(

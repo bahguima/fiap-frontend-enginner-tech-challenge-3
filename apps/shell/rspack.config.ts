@@ -5,9 +5,6 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { sharedDependencies } from '../../tools/module-federation/shared';
 
-// __dirname is undefined when @rspack/cli loads this config as ESM (it
-// does, because the file uses `import` statements). Derive it from the
-// module URL so the config works regardless of how the loader interprets it.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = 4200;
@@ -20,9 +17,6 @@ const DASHBOARD_REMOTE_URL =
   process.env.DASHBOARD_REMOTE_URL ??
   'http://127.0.0.1:8102/remoteEntry.js';
 
-// Read mode from the rspack CLI arg (`--mode=development|production`) so the
-// config works the same on Windows + POSIX without depending on a shell
-// `NODE_ENV=...` prefix.
 export default defineConfig((_env, argv) => {
   const isDev = argv.mode !== 'production';
   return {
@@ -30,7 +24,10 @@ export default defineConfig((_env, argv) => {
     entry: { main: './src/index.ts' },
     output: {
       path: path.resolve(__dirname, 'dist'),
-      publicPath: 'auto',
+      // Absoluto: com "auto" o HTML referencia "main.js" relativo e, ao abrir
+      // uma rota profunda (ex.: /dashboard/profile), o navegador pede
+      // /dashboard/main.js, que não existe. O host é servido na raiz.
+      publicPath: '/',
       uniqueName: NAME,
       clean: true,
     },
@@ -51,6 +48,10 @@ export default defineConfig((_env, argv) => {
           WORKSPACE_ROOT,
           'libs/shared/query/src'
         ),
+        '@banking/shared/reactive': path.resolve(
+          WORKSPACE_ROOT,
+          'libs/shared/reactive/src'
+        ),
         '@banking/shared/api-client': path.resolve(
           WORKSPACE_ROOT,
           'libs/shared/api-client/src'
@@ -62,6 +63,10 @@ export default defineConfig((_env, argv) => {
         '@banking/shared/domain': path.resolve(
           WORKSPACE_ROOT,
           'libs/shared/domain/src'
+        ),
+        '@banking/shared/security': path.resolve(
+          WORKSPACE_ROOT,
+          'libs/shared/security/src'
         ),
         '@banking/shared/testing': path.resolve(
           WORKSPACE_ROOT,
@@ -107,6 +112,15 @@ export default defineConfig((_env, argv) => {
         ),
         'process.env.NEXT_PUBLIC_API_MOCK_DELAY_MS': JSON.stringify(
           process.env.NEXT_PUBLIC_API_MOCK_DELAY_MS ?? '150'
+        ),
+        'process.env.NEXT_PUBLIC_API_MOCK_ACCESS_TOKEN_TTL_SECONDS': JSON.stringify(
+          process.env.NEXT_PUBLIC_API_MOCK_ACCESS_TOKEN_TTL_SECONDS ?? '300'
+        ),
+        'process.env.NEXT_PUBLIC_IDLE_TIMEOUT_SECONDS': JSON.stringify(
+          process.env.NEXT_PUBLIC_IDLE_TIMEOUT_SECONDS ?? '600'
+        ),
+        'process.env.NEXT_PUBLIC_IDLE_WARNING_SECONDS': JSON.stringify(
+          process.env.NEXT_PUBLIC_IDLE_WARNING_SECONDS ?? '60'
         ),
       }),
       new rspack.CopyRspackPlugin({

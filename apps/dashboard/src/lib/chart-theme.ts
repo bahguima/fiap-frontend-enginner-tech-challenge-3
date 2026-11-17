@@ -1,27 +1,6 @@
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-} from "chart.js";
+// Apenas utilitários de cor: o registro do chart.js fica em
+// `components/dashboard/TrendLineChart`, carregado sob demanda.
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Filler,
-  Tooltip,
-  Legend,
-);
-
-/** Resolve CSS variable (HSL triplet) to a usable hsl() string. */
 export function hslVar(name: string, alpha = 1): string {
   if (typeof window === "undefined") return `hsl(0 0% 0% / ${alpha})`;
   const raw = getComputedStyle(document.documentElement)

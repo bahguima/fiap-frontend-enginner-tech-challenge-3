@@ -65,4 +65,31 @@ describe("DeleteTransactionModal", () => {
     expect(screen.getByRole("button", { name: "Excluir" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeDisabled();
   });
+
+  it("permanece aberto durante a exclusão otimista, quando a transação já saiu da lista", () => {
+    const { rerender } = render(
+      <DeleteTransactionModal
+        open
+        transaction={null}
+        onOpenChange={jest.fn()}
+        onConfirm={jest.fn()}
+        isSubmitting
+      />,
+    );
+
+    expect(
+      screen.getByRole("dialog", { name: "Excluir transação?" }),
+    ).toHaveAttribute("aria-busy", "true");
+
+    rerender(
+      <DeleteTransactionModal
+        open
+        transaction={null}
+        onOpenChange={jest.fn()}
+        onConfirm={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
 });

@@ -42,8 +42,13 @@ Passe o arquivo aos comandos com `--env-file .env.docker`.
 | `NEXT_PUBLIC_API_BASE_URL` | vazio | URL pública da API REST |
 | `NEXT_PUBLIC_API_MOCKING` | `enabled` no Compose de desenvolvimento | Ativação do MSW |
 | `NEXT_PUBLIC_API_MOCK_DELAY_MS` | `150` | Latência padrão dos handlers MSW |
+| `NEXT_PUBLIC_API_MOCK_ACCESS_TOKEN_TTL_SECONDS` | `300` | Vida do access token emitido pelo MSW (somente com mocks) |
+| `NEXT_PUBLIC_IDLE_TIMEOUT_SECONDS` | `600` | Tempo total sem atividade até o logout automático (shell) |
+| `NEXT_PUBLIC_IDLE_WARNING_SECONDS` | `60` | Duração do aviso antes do logout; precisa ser menor que o timeout |
 | `INSTITUTIONAL_REMOTE_URL` | `http://127.0.0.1:8101/remoteEntry.js` | Entrada pública do remote institucional |
 | `DASHBOARD_REMOTE_URL` | `http://127.0.0.1:8102/remoteEntry.js` | Entrada pública do remote de dashboard |
+| `CSP_REMOTE_ORIGINS` | `http://127.0.0.1:8101 http://127.0.0.1:8102` (shell) | Origens dos remotes liberadas em `script-src`/`connect-src` da CSP do shell (lida pelo nginx na partida do container) |
+| `CSP_API_ORIGIN` | vazio | Origem da API na CSP, quando diferente da origem da página |
 | `IMAGE_TAG` | `local` | Tag das imagens de produção |
 
 As URLs dos remotes e da API são incorporadas ao bundle durante o build de
