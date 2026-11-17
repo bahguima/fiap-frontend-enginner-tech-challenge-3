@@ -81,7 +81,7 @@ As plataformas compartilham apenas código independente de UI. Componentes, rote
 
 ## Código-fonte e execução local do mobile
 
-O código-fonte está disponível no repositório Git [bahguima/fiap-frontend-enginner-tech-challenge-3](https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-3). O aplicativo mobile fica em `apps/mobile`, e as configurações locais do Firebase ficam em `firebase`.
+O código-fonte está disponível no repositório Git [bahguima/fiap-frontend-enginner-tech-challenge-3](https://github.com/bahguima/fiap-frontend-enginner-tech-challenge-4). O aplicativo mobile fica em `apps/mobile`, e as configurações locais do Firebase ficam em `firebase`.
 
 ### Dependências necessárias
 
@@ -287,12 +287,3 @@ Antes de gravar, inicie os emuladores com seed conhecido, confirme que o disposi
 - Preencha todas as seis variáveis públicas.
 - Use project ID que não comece com `demo-`.
 - Reinicie o Metro após alterar `.env.local`.
-
-## Documentação complementar
-
-- [Arquitetura geral](docs/ARCHITECTURE.md)
-- [Arquitetura mobile da fase 3](docs/MOBILE_ARCHITECTURE.md)
-- [Firebase real e builds Expo/EAS](docs/MOBILE_BUILD.md)
-- [Firebase Emulator Suite](firebase/README.md)
-- [Mapeamento da interface mobile](docs/MOBILE_UI_MAPPING.md)
-- [Dívida técnica](docs/TECHNICAL_DEBT.md)
