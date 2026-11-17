@@ -1,4 +1,4 @@
-# ByteBank — Tech Challenge fase 3
+# ByteBank — Tech Challenge fase 4
 
 O ByteBank é uma plataforma de controle financeiro pessoal com aplicações **web e mobile** no mesmo workspace Nx. A fase 3 preserva a experiência web e adiciona um aplicativo Expo para Android e iOS, conectado ao Firebase Authentication, Cloud Firestore e Cloud Storage.
 
